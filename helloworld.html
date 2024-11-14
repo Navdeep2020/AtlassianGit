@@ -3,10 +3,12 @@
     <head>
         <link rel="stylesheet" href="https://unpkg.com/@atlaskit/css-reset@2.0.0/dist/bundle.css" media="all">
         <script src="https://connect-cdn.atl-paas.net/all.js" async></script>
+        <script src="app.js"></script> 
     </head>
     <body>
         <section id="content" class="ac-content">
-            <h1>Hello World</h1>
+            <h1 id="greeting">Hello World</h1>
+            <button onclick="changeGreeting()">Change Greeting</button>
         </section>
     </body>
 </html>
