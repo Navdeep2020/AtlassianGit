@@ -7,12 +7,14 @@
     </head>
     <body>
         <h1>Hello, User!</h1>
-        <button id="change-greetings">Change Greetings</button>
+        <button id="go-to-projects">Go to Projects</button>
 
         <script>
-           document.getElementById("change-greetings").addEventListener("click", () => {
+           document.getElementById("go-to-projects").addEventListener("click", () => {
             // Redirect to the user's dashboard
-            AP.navigator.go('dashboard');
+            // AP.navigator.go('dashboard');
+            // Redirect to the Projects page
+               AP.navigator.go('projects');   
           });
        </script>
     </body>
