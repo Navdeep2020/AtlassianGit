@@ -7,20 +7,19 @@
   <script src="https://navsingh-test-site.atlassian.net/atlassian-connect/all.js"></script>
 </head>
 <body>
-  <p id="custom-message">Loading...</p>
-  <script>
-    // Parse query parameters
-    const params = new URLSearchParams(window.location.search);
-    const boardId = params.get('id');
-    const mode = params.get('mode');
+  <div>
+    <select id="dropdown" style="width: 200px;">
+      <option value="option1">Option 1</option>
+      <option value="option2">Option 2</option>
+      <option value="option3">Option 3</option>
+    </select>
+  </div>
 
-    // Render message
-    const messageElement = document.getElementById('custom-message');
-    if (boardId && mode) {
-      messageElement.textContent = `We are viewing board ${boardId} in ${mode} mode.`;
-    } else {
-      messageElement.textContent = "Board information is missing.";
-    }
+  <script>
+    // Handle dropdown changes
+    document.getElementById('dropdown').addEventListener('change', (event) => {
+      alert(`Selected value: ${event.target.value}`);
+    });
   </script>
 </body>
 </html>
