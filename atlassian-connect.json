@@ -11,7 +11,7 @@
     "modules": {
       "generalPages": [
         {
-          "url": "/index.html",
+          "url": "/helloworld.html",
           "key": "main-page",
           "location": "system.top.navigation.bar",
           "name": {
