@@ -3,7 +3,7 @@
     "name": "Your App Name",
     "baseUrl": "https://navdeep2020.github.io/AtlassianGit",
     "authentication": {
-      "type": "jwt"
+      "type": "none"
     },
     "scopes": [
       "read"
