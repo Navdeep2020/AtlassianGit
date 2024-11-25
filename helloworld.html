@@ -25,14 +25,16 @@
           const projects = JSON.parse(response);
           const projectList = document.getElementById('project-list');
           projectList.innerHTML = '';
+
           projects.forEach(project => {
             const li = document.createElement('li');
             li.textContent = `${project.key}: ${project.name}`;
-
-            li.addEventListener('click', function () {
-              fetchActiveSprints(project.id);
-            });
             
+            // Add a click listener to fetch active sprints for the project
+            li.addEventListener('click', function () {
+              fetchBoardsAndActiveSprints(project.id);
+            });
+
             projectList.appendChild(li);
           });
         },
@@ -42,34 +44,69 @@
       });
     });
 
-      function fetchActiveSprints(projectId) {
+    // Function to fetch boards for a project and then active sprints
+    function fetchBoardsAndActiveSprints(projectId) {
       const sprintList = document.getElementById('sprint-list');
-      sprintList.innerHTML = ''; 
+      sprintList.innerHTML = ''; // Clear previous sprints
 
-      // Constructing URL
-      const url = `/rest/agile/1.0/board/${projectId}/sprint?state=active`;
+      // Fetch boards for the given project ID
+      const boardUrl = `/rest/agile/1.0/board?projectKeyOrId=${projectId}`;
 
       AP.request({
-        url: url,
+        url: boardUrl,
+        type: 'GET',
+        success: function(response) {
+          const boards = JSON.parse(response).values;
+
+          if (boards.length === 0) {
+            sprintList.innerHTML = '<li>No boards found for this project.</li>';
+            return;
+          }
+
+          // Iterate through boards and fetch active sprints for each
+          boards.forEach(board => {
+            fetchActiveSprints(board.id, board.name);
+          });
+        },
+        error: function(err) {
+          console.error('Error fetching boards:', err);
+          sprintList.innerHTML = '<li>Error fetching boards for the project.</li>';
+        }
+      });
+    }
+
+    // Function to fetch active sprints for a specific board
+    function fetchActiveSprints(boardId, boardName) {
+      const sprintList = document.getElementById('sprint-list');
+
+      // Construct URL for fetching sprints
+      const sprintUrl = `/rest/agile/1.0/board/${boardId}/sprint?state=active`;
+
+      AP.request({
+        url: sprintUrl,
         type: 'GET',
         success: function(response) {
           const sprints = JSON.parse(response).values;
 
           if (sprints.length === 0) {
-            sprintList.innerHTML = '<li>No active sprints available.</li>';
+            const li = document.createElement('li');
+            li.textContent = `No active sprints found for board: ${boardName}`;
+            sprintList.appendChild(li);
             return;
           }
 
-          // Populate the active sprints
+          // Display each active sprint
           sprints.forEach(sprint => {
             const li = document.createElement('li');
-            li.textContent = `Sprint: ${sprint.name}, Start: ${sprint.startDate}, End: ${sprint.endDate}`;
+            li.textContent = `Board: ${boardName}, Sprint: ${sprint.name}, Start: ${sprint.startDate || 'N/A'}, End: ${sprint.endDate || 'N/A'}`;
             sprintList.appendChild(li);
           });
         },
         error: function(err) {
-          console.error('Error fetching sprints:', err);
-          sprintList.innerHTML = '<li>Error fetching active sprints.</li>';
+          console.error(`Error fetching sprints for board ${boardId}:`, err);
+          const li = document.createElement('li');
+          li.textContent = `Error fetching sprints for board: ${boardName}`;
+          sprintList.appendChild(li);
         }
       });
     }
