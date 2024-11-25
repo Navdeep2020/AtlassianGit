@@ -10,6 +10,10 @@
   <h3>What can I do for you?</h3>
   <button id="fetch-projects">Fetch Projects</button>
   <ul id="project-list"></ul>
+  <div id="sprint-details" style="margin-top: 20px;">
+    <h3>Active Sprints</h3>
+    <ul id="sprint-list"></ul>
+  </div>
 
   <script>
     document.getElementById('fetch-projects').addEventListener('click', function () {
@@ -24,6 +28,11 @@
           projects.forEach(project => {
             const li = document.createElement('li');
             li.textContent = `${project.key}: ${project.name}`;
+
+            li.addEventListener('click', function () {
+              fetchActiveSprints(project.id);
+            });
+            
             projectList.appendChild(li);
           });
         },
@@ -32,6 +41,38 @@
         }
       });
     });
+
+      function fetchActiveSprints(projectId) {
+      const sprintList = document.getElementById('sprint-list');
+      sprintList.innerHTML = ''; 
+
+      // Constructing URL
+      const url = `/rest/agile/1.0/board/${projectId}/sprint?state=active`;
+
+      AP.request({
+        url: url,
+        type: 'GET',
+        success: function(response) {
+          const sprints = JSON.parse(response).values;
+
+          if (sprints.length === 0) {
+            sprintList.innerHTML = '<li>No active sprints available.</li>';
+            return;
+          }
+
+          // Populate the active sprints
+          sprints.forEach(sprint => {
+            const li = document.createElement('li');
+            li.textContent = `Sprint: ${sprint.name}, Start: ${sprint.startDate}, End: ${sprint.endDate}`;
+            sprintList.appendChild(li);
+          });
+        },
+        error: function(err) {
+          console.error('Error fetching sprints:', err);
+          sprintList.innerHTML = '<li>Error fetching active sprints.</li>';
+        }
+      });
+    }
   </script>
 </body>
 </html>
