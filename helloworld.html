@@ -4,20 +4,93 @@
   <meta charset="UTF-8">
   <title>Your Connect App</title>
   <script src="https://connect-cdn.atl-paas.net/all.js"></script>
+  <style>
+    /* Overall page styling */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #008080; /* Teal background */
+      color: #ffffff; 
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+    
+    button {
+      background-color: #ffffff;
+      color: #008080;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    button:hover {
+      background-color: #006666;
+      color: #ffffff;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 20px 0;
+      text-align: left;
+      width: 60%;
+    }
+
+    ul li {
+      background-color: #ffffff;
+      color: #008080;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    ul li:hover {
+      background-color: #006666;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    /* Sprint details section */
+    #sprint-details {
+      width: 80%;
+      margin: 20px auto;
+    }
+  </style>
 </head>
 <body>
   <h1>Hello, navsingh!</h1>
   <h3>What can I do for you?</h3>
   <button id="fetch-projects">Fetch Projects</button>
   <ul id="project-list"></ul>
-  <div id="sprint-details" style="margin-top: 20px;">
+  <div id="sprint-details">
     <h3>Active Sprints</h3>
     <ul id="sprint-list"></ul>
   </div>
 
   <script>
     document.getElementById('fetch-projects').addEventListener('click', function () {
-      // Ensure Jira API is loaded
+      // Ensuring that Jira API is loaded
       AP.request({
         url: '/rest/api/3/project',
         type: 'GET',
@@ -30,7 +103,7 @@
             const li = document.createElement('li');
             li.textContent = `${project.key}: ${project.name}`;
             
-            // Add a click listener to fetch active sprints for the project
+            // Added a click listener
             li.addEventListener('click', function () {
               fetchBoardsAndActiveSprints(project.id);
             });
@@ -47,7 +120,7 @@
     // Function to fetch boards for a project and then active sprints
     function fetchBoardsAndActiveSprints(projectId) {
       const sprintList = document.getElementById('sprint-list');
-      sprintList.innerHTML = ''; // Clear previous sprints
+      sprintList.innerHTML = ''; 
 
       // Fetch boards for the given project ID
       const boardUrl = `/rest/agile/1.0/board?projectKeyOrId=${projectId}`;
@@ -79,7 +152,6 @@
     function fetchActiveSprints(boardId, boardName) {
       const sprintList = document.getElementById('sprint-list');
 
-      // Construct URL for fetching sprints
       const sprintUrl = `/rest/agile/1.0/board/${boardId}/sprint?state=active`;
 
       AP.request({
@@ -95,7 +167,6 @@
             return;
           }
 
-          // Display each active sprint
           sprints.forEach(sprint => {
             const li = document.createElement('li');
             li.textContent = `Board: ${boardName}, Sprint: ${sprint.name}, Start: ${sprint.startDate || 'N/A'}, End: ${sprint.endDate || 'N/A'}`;
@@ -113,3 +184,4 @@
   </script>
 </body>
 </html>
+
