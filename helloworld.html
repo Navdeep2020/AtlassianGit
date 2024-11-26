@@ -6,18 +6,27 @@
   <script src="https://connect-cdn.atl-paas.net/all.js"></script>
   <style>
     /* Overall page styling */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background-color: #008080; /* Teal background */
-      color: #ffffff; 
+ body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #ffffff; /* White background */
+    color: #008080; /* Teal text color */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+    .container {
+      background: rgba(255, 255, 255, 0.8);
+      color: #008080;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
     }
 
     h1 {
@@ -29,19 +38,19 @@
       font-size: 1.5em;
       margin-bottom: 20px;
     }
-    
-    button {
-      background-color: #ffffff;
-      color: #008080;
-      border: none;
-      padding: 10px 20px;
+
+    select, button {
+      padding: 10px;
       font-size: 1em;
+      margin: 10px 0;
+      border: 1px solid #008080;
       border-radius: 5px;
       cursor: pointer;
-      transition: background-color 0.3s, color 0.3s;
+      background-color: #ffffff;
+      color: #008080;
     }
 
-    button:hover {
+    select:hover, button:hover {
       background-color: #006666;
       color: #ffffff;
     }
@@ -51,7 +60,6 @@
       padding: 0;
       margin: 20px 0;
       text-align: left;
-      width: 60%;
     }
 
     ul li {
@@ -61,68 +69,55 @@
       padding: 10px;
       border-radius: 5px;
       font-size: 1em;
-      cursor: pointer;
-      transition: background-color 0.3s, transform 0.2s;
-    }
-
-    ul li:hover {
-      background-color: #006666;
-      color: #ffffff;
-      transform: translateY(-2px);
-    }
-
-    /* Sprint details section */
-    #sprint-details {
-      width: 80%;
-      margin: 20px auto;
     }
   </style>
 </head>
 <body>
-  <h1>Hello, navsingh!</h1>
-  <h3>What can I do for you?</h3>
-  <button id="fetch-projects">Fetch Projects</button>
-  <ul id="project-list"></ul>
-  <div id="sprint-details">
-    <h3>Active Sprints</h3>
-    <ul id="sprint-list"></ul>
+  <div class="container">
+    <h1>Hello, navsingh!</h1>
+    <h3>Select a Project</h3>
+    <select id="project-dropdown">
+      <option value="">-- Select Project --</option>
+    </select>
+    <h3>Select a Sprint</h3>
+    <select id="sprint-dropdown" disabled>
+      <option value="">-- Select Sprint --</option>
+    </select>
+    <h3>Issues in Sprint</h3>
+    <ul id="issues-list"></ul>
   </div>
-  <div id="issue-details" style="margin-top: 20px;">
-  <h3>Issues in Sprint</h3>
-  <ul id="issues-list"></ul>
-  </div>
 
-<script>
-    document.getElementById('fetch-projects').addEventListener('click', function () {
-      AP.request({
-        url: '/rest/api/3/project',
-        type: 'GET',
-        success: function(response) {
-          const projects = JSON.parse(response);
-          const projectList = document.getElementById('project-list');
-          projectList.innerHTML = '';
+  <script>
+    const projectDropdown = document.getElementById('project-dropdown');
+    const sprintDropdown = document.getElementById('sprint-dropdown');
+    const issuesList = document.getElementById('issues-list');
 
-          projects.forEach(project => {
-            const li = document.createElement('li');
-            li.textContent = `${project.key}: ${project.name}`;
-            
-            // Add click listener for fetching sprints
-            li.addEventListener('click', function () {
-              fetchBoardsAndActiveSprints(project.key, project.name);
-            });
-
-            projectList.appendChild(li);
-          });
-        },
-        error: function(err) {
-          console.error('Error fetching projects:', err);
-        }
-      });
+    // Fetch and populate projects in the dropdown
+    AP.request({
+      url: '/rest/api/3/project',
+      type: 'GET',
+      success: function(response) {
+        const projects = JSON.parse(response);
+        projects.forEach(project => {
+          const option = document.createElement('option');
+          option.value = project.key;
+          option.textContent = project.name;
+          projectDropdown.appendChild(option);
+        });
+      },
+      error: function(err) {
+        console.error('Error fetching projects:', err);
+      }
     });
 
-    function fetchBoardsAndActiveSprints(projectKey, projectName) {
-      const sprintList = document.getElementById('sprint-list');
-      sprintList.innerHTML = '';
+    // Fetch and populate sprints when a project is selected
+    projectDropdown.addEventListener('change', function() {
+      const projectKey = this.value;
+      sprintDropdown.innerHTML = '<option value="">-- Select Sprint --</option>';
+      issuesList.innerHTML = '';
+      sprintDropdown.disabled = true;
+
+      if (!projectKey) return;
 
       const boardUrl = `/rest/agile/1.0/board?projectKeyOrId=${projectKey}`;
       AP.request({
@@ -130,78 +125,57 @@
         type: 'GET',
         success: function(response) {
           const boards = JSON.parse(response).values;
-
-          if (boards.length === 0) {
-            sprintList.innerHTML = '<li>No boards found for this project.</li>';
-            return;
-          }
-
           boards.forEach(board => {
-            fetchActiveSprints(board.id, board.name, projectName);
+            fetchSprints(board.id);
           });
         },
         error: function(err) {
           console.error('Error fetching boards:', err);
-          sprintList.innerHTML = '<li>Error fetching boards for the project.</li>';
         }
       });
-    }
+    });
 
-    function fetchActiveSprints(boardId, boardName, projectName) {
-      const sprintList = document.getElementById('sprint-list');
+    function fetchSprints(boardId) {
       const sprintUrl = `/rest/agile/1.0/board/${boardId}/sprint?state=active`;
-
       AP.request({
         url: sprintUrl,
         type: 'GET',
         success: function(response) {
           const sprints = JSON.parse(response).values;
-
-          if (sprints.length === 0) {
-            const li = document.createElement('li');
-            li.textContent = `No active sprints found for board: ${boardName}`;
-            sprintList.appendChild(li);
-            return;
-          }
-
-          sprints.forEach(sprint => {
-            const li = document.createElement('li');
-             li.textContent = `Project: ${projectName}, Sprint: ${sprint.name}`;
-            
-            // Add click listener for fetching issues in sprint
-            li.addEventListener('click', function () {
-              fetchIssuesInSprint(projectName, sprint.name);
+          if (sprints.length > 0) {
+            sprintDropdown.disabled = false;
+            sprints.forEach(sprint => {
+              const option = document.createElement('option');
+              option.value = sprint.name;
+              option.textContent = sprint.name;
+              sprintDropdown.appendChild(option);
             });
-
-            sprintList.appendChild(li);
-          });
+          }
         },
         error: function(err) {
-          console.error(`Error fetching sprints for board ${boardId}:`, err);
-          const li = document.createElement('li');
-          li.textContent = `Error fetching sprints for board: ${boardName}`;
-          sprintList.appendChild(li);
+          console.error('Error fetching sprints:', err);
         }
       });
     }
 
-    function fetchIssuesInSprint(projectName, sprintName) {
-      const issuesList = document.getElementById('issues-list');
+    // Fetch and display issues when a sprint is selected
+    sprintDropdown.addEventListener('change', function() {
+      const projectName = projectDropdown.value;
+      const sprintName = this.value;
       issuesList.innerHTML = '';
 
-      const issuesUrl = `/rest/api/2/search?jql=project="${projectName}" AND sprint="${sprintName}"`;
+      if (!sprintName) return;
 
+      const issuesUrl = `/rest/api/2/search?jql=project="${projectName}" AND sprint="${sprintName}"`;
       AP.request({
         url: issuesUrl,
         type: 'GET',
         success: function(response) {
           const issues = JSON.parse(response).issues;
-
           if (issues.length === 0) {
             issuesList.innerHTML = '<li>No issues found for this sprint.</li>';
             return;
           }
-
           issues.forEach(issue => {
             const li = document.createElement('li');
             li.textContent = `Key: ${issue.key}, Summary: ${issue.fields.summary}`;
@@ -213,8 +187,7 @@
           issuesList.innerHTML = '<li>Error fetching issues for this sprint.</li>';
         }
       });
-    }
+    });
   </script>
 </body>
 </html>
-
