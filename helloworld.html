@@ -88,9 +88,8 @@
     <ul id="sprint-list"></ul>
   </div>
 
-  <script>
+<script>
     document.getElementById('fetch-projects').addEventListener('click', function () {
-      // Ensuring that Jira API is loaded
       AP.request({
         url: '/rest/api/3/project',
         type: 'GET',
@@ -103,9 +102,9 @@
             const li = document.createElement('li');
             li.textContent = `${project.key}: ${project.name}`;
             
-            // Added a click listener
+            // Add click listener for fetching sprints
             li.addEventListener('click', function () {
-              fetchBoardsAndActiveSprints(project.id);
+              fetchBoardsAndActiveSprints(project.key, project.name);
             });
 
             projectList.appendChild(li);
@@ -117,14 +116,11 @@
       });
     });
 
-    // Function to fetch boards for a project and then active sprints
-    function fetchBoardsAndActiveSprints(projectId) {
+    function fetchBoardsAndActiveSprints(projectKey, projectName) {
       const sprintList = document.getElementById('sprint-list');
-      sprintList.innerHTML = ''; 
+      sprintList.innerHTML = '';
 
-      // Fetch boards for the given project ID
-      const boardUrl = `/rest/agile/1.0/board?projectKeyOrId=${projectId}`;
-
+      const boardUrl = `/rest/agile/1.0/board?projectKeyOrId=${projectKey}`;
       AP.request({
         url: boardUrl,
         type: 'GET',
@@ -136,9 +132,8 @@
             return;
           }
 
-          // Iterate through boards and fetch active sprints for each
           boards.forEach(board => {
-            fetchActiveSprints(board.id, board.name);
+            fetchActiveSprints(board.id, board.name, projectName);
           });
         },
         error: function(err) {
@@ -148,10 +143,8 @@
       });
     }
 
-    // Function to fetch active sprints for a specific board
-    function fetchActiveSprints(boardId, boardName) {
+    function fetchActiveSprints(boardId, boardName, projectName) {
       const sprintList = document.getElementById('sprint-list');
-
       const sprintUrl = `/rest/agile/1.0/board/${boardId}/sprint?state=active`;
 
       AP.request({
@@ -170,9 +163,12 @@
           sprints.forEach(sprint => {
             const li = document.createElement('li');
             li.textContent = `Sprint: ${sprint.name}`;
+            
+            // Add click listener for fetching issues in sprint
             li.addEventListener('click', function () {
-              fetchIssuesForSprint(boardId, sprint.id, sprint.name);
+              fetchIssuesInSprint(projectName, sprint.name);
             });
+
             sprintList.appendChild(li);
           });
         },
@@ -185,11 +181,11 @@
       });
     }
 
-  function fetchIssuesForSprint(projectId, sprintId, sprintName) {
+    function fetchIssuesInSprint(projectName, sprintName) {
       const issuesList = document.getElementById('issues-list');
       issuesList.innerHTML = '';
 
-      const issuesUrl = `/rest/api/2/search?jql=project=${projectId} AND sprint=${sprintId}`;
+      const issuesUrl = `/rest/api/2/search?jql=project="${projectName}" AND sprint="${sprintName}"`;
 
       AP.request({
         url: issuesUrl,
@@ -198,23 +194,19 @@
           const issues = JSON.parse(response).issues;
 
           if (issues.length === 0) {
-            const li = document.createElement('li');
-            li.textContent = `No issues found for sprint: ${sprintName}`;
-            issuesList.appendChild(li);
+            issuesList.innerHTML = '<li>No issues found for this sprint.</li>';
             return;
           }
 
           issues.forEach(issue => {
             const li = document.createElement('li');
-            li.textContent = `Issue: ${issue.key}, Summary: ${issue.fields.summary}`;
+            li.textContent = `Key: ${issue.key}, Summary: ${issue.fields.summary}`;
             issuesList.appendChild(li);
           });
         },
         error: function(err) {
           console.error('Error fetching issues:', err);
-          const li = document.createElement('li');
-          li.textContent = 'Error fetching issues for this sprint.';
-          issuesList.appendChild(li);
+          issuesList.innerHTML = '<li>Error fetching issues for this sprint.</li>';
         }
       });
     }
