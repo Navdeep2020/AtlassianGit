@@ -162,7 +162,7 @@
 
           sprints.forEach(sprint => {
             const li = document.createElement('li');
-            li.textContent = `Sprint: ${sprint.name}`;
+             li.textContent = `Project: ${projectName}, Sprint: ${sprint.name}`;
             
             // Add click listener for fetching issues in sprint
             li.addEventListener('click', function () {
