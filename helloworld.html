@@ -169,7 +169,10 @@
 
           sprints.forEach(sprint => {
             const li = document.createElement('li');
-            li.textContent = `Board: ${boardName}, Sprint: ${sprint.name}, Start: ${sprint.startDate || 'N/A'}, End: ${sprint.endDate || 'N/A'}`;
+            li.textContent = `Sprint: ${sprint.name}`;
+            li.addEventListener('click', function () {
+              fetchIssuesForSprint(boardId, sprint.id, sprint.name);
+            });
             sprintList.appendChild(li);
           });
         },
@@ -178,6 +181,40 @@
           const li = document.createElement('li');
           li.textContent = `Error fetching sprints for board: ${boardName}`;
           sprintList.appendChild(li);
+        }
+      });
+    }
+
+  function fetchIssuesForSprint(projectId, sprintId, sprintName) {
+      const issuesList = document.getElementById('issues-list');
+      issuesList.innerHTML = '';
+
+      const issuesUrl = `/rest/api/2/search?jql=project=${projectId} AND sprint=${sprintId}`;
+
+      AP.request({
+        url: issuesUrl,
+        type: 'GET',
+        success: function(response) {
+          const issues = JSON.parse(response).issues;
+
+          if (issues.length === 0) {
+            const li = document.createElement('li');
+            li.textContent = `No issues found for sprint: ${sprintName}`;
+            issuesList.appendChild(li);
+            return;
+          }
+
+          issues.forEach(issue => {
+            const li = document.createElement('li');
+            li.textContent = `Issue: ${issue.key}, Summary: ${issue.fields.summary}`;
+            issuesList.appendChild(li);
+          });
+        },
+        error: function(err) {
+          console.error('Error fetching issues:', err);
+          const li = document.createElement('li');
+          li.textContent = 'Error fetching issues for this sprint.';
+          issuesList.appendChild(li);
         }
       });
     }
