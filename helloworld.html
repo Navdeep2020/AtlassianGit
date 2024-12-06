@@ -86,6 +86,7 @@
     <h3>Issues in Sprint</h3>
     <ul id="issues-list"></ul>
     <h3>Issues in MOBL Sprint 26-Nov</h3>
+    <button id="fetch-issues-btn">Load Issues</button>
     <ul id="mobl-issues-list"></ul>
   </div>
 
@@ -160,43 +161,51 @@
       });
     }
 
-    const issuesList = document.getElementById('mobl-issues-list');
-
-    // Fetch the JSON data
-    fetch('response.json') // Make sure `issues.json` is in the same directory as this HTML file
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        displayIssues(data);
-      })
-      .catch(error => {
-        console.error('Error loading JSON data:', error);
-        issuesList.innerHTML = '<li>Failed to load issues.</li>';
-      });
+        // Get the button and issues list container
+    const fetchIssuesButton = document.getElementById('fetch-issues-btn');
+    const moblissuesList = document.getElementById('mobl-issues-list');
 
     // Function to fetch and display issues
     function displayIssues(data) {
-      issuesList.innerHTML = ''; // Clear existing list
-      const issues = data.issues;
+      // Clear the existing list
+      moblissuesList.innerHTML = '';
 
-      if (issues.length === 0) {
-        issuesList.innerHTML = '<li>No issues found for this sprint.</li>';
-        return;
+      // Check if issues exist
+      if (data.issues && data.issues.length > 0) {
+        // Loop through the issues and display them
+        data.issues.forEach(issue => {
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <strong>${issue.key}</strong>: ${issue.fields.summary}
+            <br>Assignee: ${issue.fields.assignee ? issue.fields.assignee.displayName : 'Unassigned'}
+          `;
+          moblissuesList.appendChild(listItem);
+        });
+      } else {
+        // If no issues are available
+        moblissuesList.innerHTML = '<li>No issues found.</li>';
       }
-
-      issues.forEach(issue => {
-        const li = document.createElement('li');
-        const key = issue.key;
-        const summary = issue.fields.summary;
-        const assignee = issue.fields.assignee ? issue.fields.assignee.displayName : 'Unassigned';
-        li.textContent = `Key: ${key}, Summary: ${summary}, Assignee: ${assignee}`;
-        issuesList.appendChild(li);
-      });
     }
+
+    // Attach click event to the button
+    fetchIssuesButton.addEventListener('click', () => {
+      // Fetch the JSON data when the button is clicked
+      fetch('response.json') // Ensure `issues.json` is in the same directory as this HTML file
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Call display function with the fetched data
+          displayIssues(data);
+        })
+        .catch(error => {
+          console.error('Error loading JSON data:', error);
+          moblissuesList.innerHTML = '<li>Failed to load issues.</li>';
+        });
+    });
 
     // Fetch and display issues when a sprint is selected
     sprintDropdown.addEventListener('change', function() {
