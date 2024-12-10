@@ -109,7 +109,7 @@
                     const worklogs = issue.fields.worklog?.worklogs || [];
                     const statusName = issue.fields.status?.name || "";
                     const sprintField = issue.fields.customfield_10104 || [];
-                    const prField = issue.fields.customfield_11201 ? JSON.parse(issue.fields.customfield_11201) : null;
+                    const prField = issue.fields.customfield_11201;
 
                     // Calculate total time spent in minutes
                     const totalTimeSpentInMinutes = worklogs.reduce((total, log) => {
