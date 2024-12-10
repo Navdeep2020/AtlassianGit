@@ -109,7 +109,7 @@
                     const worklogs = issue.fields.worklog?.worklogs || [];
                     const statusName = issue.fields.status?.name || "";
                     const sprintField = issue.fields.customfield_10104 || [];
-                    const prField = issue.fields.customfield_11201;
+                    const prField = issue.fields.customfield_11201?.summaryBean?.summary?.pullrequest?.overall || {};
 
                     // Calculate total time spent in minutes
                     const totalTimeSpentInMinutes = worklogs.reduce((total, log) => {
@@ -120,8 +120,8 @@
                     const isCarryForward = sprintField.length > 1;
 
                     // Get the PR count
-                    const prCount = prField?.summaryBean?.summary?.pullrequest?.overall?.stateCount || 0;
-                    
+                     const prCount = prField.stateCount || 0;
+            
                     // Add or update assignee data
                     if (!uniqueAssignees.has(assignee)) {
                       uniqueAssignees.add(assignee);
@@ -227,5 +227,3 @@ function formatTimeSpent(totalMinutes) {
   </script>
 </body>
 </html>
-
-
