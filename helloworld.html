@@ -89,86 +89,18 @@
     <button id="fetch-issues-btn">Load Issues</button>
     <ul id="mobl-issues-list"></ul>
     <h2>Team Work Data</h2>
+    <button id="fetch-sprint-data-btn">Fetch Sprint Data</button>
     <ul id="teamList"></ul>
   </div>
 
   <script>
-    const projectDropdown = document.getElementById('project-dropdown');
-    const sprintDropdown = document.getElementById('sprint-dropdown');
-    const issuesList = document.getElementById('issues-list');
     const name = []; // Array to store unique names
     const timeSpent = []; // Array to store corresponding time spent
-
-    // Fetch and populate projects in the dropdown
-    AP.request({
-      url: '/rest/api/3/project',
-      type: 'GET',
-      success: function(response) {
-        const projects = JSON.parse(response);
-        projects.forEach(project => {
-          const option = document.createElement('option');
-          option.value = project.key;
-          option.textContent = project.name;
-          projectDropdown.appendChild(option);
-        });
-      },
-      error: function(err) {
-        console.error('Error fetching projects:', err);
-      }
-    });
-
-    // Fetch and populate sprints when a project is selected
-    projectDropdown.addEventListener('change', function() {
-      const projectKey = this.value;
-      sprintDropdown.innerHTML = '<option value="">-- Select Sprint --</option>';
-      issuesList.innerHTML = '';
-      sprintDropdown.disabled = true;
-
-      if (!projectKey) return;
-
-      const boardUrl = `/rest/agile/1.0/board?projectKeyOrId=${projectKey}`;
-      AP.request({
-        url: boardUrl,
-        type: 'GET',
-        success: function(response) {
-          const boards = JSON.parse(response).values;
-          boards.forEach(board => {
-            fetchSprints(board.id);
-          });
-        },
-        error: function(err) {
-          console.error('Error fetching boards:', err);
-        }
-      });
-    });
-
-    function fetchSprints(boardId) {
-      const sprintUrl = `/rest/agile/1.0/board/${boardId}/sprint?state=active`;
-      AP.request({
-        url: sprintUrl,
-        type: 'GET',
-        success: function(response) {
-          const sprints = JSON.parse(response).values;
-          if (sprints.length > 0) {
-            sprintDropdown.disabled = false;
-            sprints.forEach(sprint => {
-              const option = document.createElement('option');
-              option.value = sprint.name;
-              option.textContent = sprint.name;
-              sprintDropdown.appendChild(option);
-            });
-          }
-        },
-        error: function(err) {
-          console.error('Error fetching sprints:', err);
-        }
-      });
-    }
     
     // New code
     
-        // Fetch data from the JSON file
-     document.addEventListener('DOMContentLoaded', () => {
+    // Fetch data from the JSON file
+     function fetchData() {
         fetch('response.json') // Replace with actual file path if necessary
             .then(response => response.json())
             .then(data => {
@@ -215,55 +147,10 @@
             teamList.appendChild(listItem);
         });
     }
+
+    document.getElementById('fetch-sprint-data-btn').addEventListener('click', fetchData);
     
-    
-
-        // Get the button and issues list container
-    const fetchIssuesButton = document.getElementById('fetch-issues-btn');
-    const moblissuesList = document.getElementById('mobl-issues-list');
-
-    // Function to fetch and display issues
-    function displayIssues(data) {
-      // Clear the existing list
-      moblissuesList.innerHTML = '';
-
-      // Check if issues exist
-      if (data.issues && data.issues.length > 0) {
-        // Loop through the issues and display them
-        data.issues.forEach(issue => {
-          const listItem = document.createElement('li');
-          listItem.innerHTML = `
-            <strong>${issue.key}</strong>: ${issue.fields.summary}
-            <br>Assignee: ${issue.fields.assignee ? issue.fields.assignee.displayName : 'Unassigned'}
-          `;
-          moblissuesList.appendChild(listItem);
-        });
-      } else {
-        // If no issues are available
-        moblissuesList.innerHTML = '<li>No issues found.</li>';
-      }
-    }
-
-    // Attach click event to the button
-    fetchIssuesButton.addEventListener('click', () => {
-      // Fetch the JSON data when the button is clicked
-      fetch('response.json') // Ensure `issues.json` is in the same directory as this HTML file
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          // Call display function with the fetched data
-          displayIssues(data);
-        })
-        .catch(error => {
-          console.error('Error loading JSON data:', error);
-          moblissuesList.innerHTML = '<li>Failed to load issues.</li>';
-        });
-    });
-
+  
     // Fetch and display issues when a sprint is selected
     sprintDropdown.addEventListener('change', function() {
       const projectName = projectDropdown.value;
