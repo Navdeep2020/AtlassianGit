@@ -111,6 +111,8 @@
                     const sprintField = issue.fields.customfield_10104 || [];
                     const prField = issue.fields.customfield_11201 ? JSON.parse(issue.fields.customfield_11201) : null;
 
+                  console.log('PR Field for issue:', prField);
+
                     // Calculate total time spent in minutes
                     const totalTimeSpentInMinutes = worklogs.reduce((total, log) => {
                       return total + parseTimeSpent(log.timeSpent || "0m");
@@ -120,7 +122,8 @@
                     const isCarryForward = sprintField.length > 1;
 
                     // Get the PR count
-                    const prCount = prField?.summaryBean?.summary?.pullrequest?.overall?.stateCount || 0;
+                    const prCount = prField?.summaryBean?.summary?.pullrequest?.overall?.stateCount;
+                    console.log(`PR count for ${assignee}:`, prCount);  /
             
                     // Add or update assignee data
                     if (!uniqueAssignees.has(assignee)) {
@@ -142,6 +145,9 @@
                       pullRequests[index] += prCount;
                     }
                   });
+
+                 // Log to check the PR count for all assignees
+                 console.log('Pull requests data:', pullRequests);
 
                 // Update the HTML with the unique assignees and their total time spent
                 updateHTML();
