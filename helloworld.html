@@ -82,7 +82,7 @@
         const teamData = {};
 
         issues.forEach(issue => {
-          const assignee = issue.fields.assignee?.name || "Unassigned";
+          const assignee = issue.fields.assignee?.displayName || "Unassigned";
           const worklogs = issue.fields.worklog?.worklogs || [];
           const statusName = issue.fields.status?.name || "";
           const sprintField = issue.fields.customfield_10104 || [];
