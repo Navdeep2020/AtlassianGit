@@ -1,60 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JIRA Assignee and Time Spent</title>
+  <meta charset="UTF-8">
+  <title>Your Connect App</title>
+  <script src="https://connect-cdn.atl-paas.net/all.js"></script>
+  <style>
+    /* Overall page styling */
+ body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #ffffff; /* White background */
+    color: #008080; /* Teal text color */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+    .container {
+      background: rgba(255, 255, 255, 0.8);
+      color: #008080;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+
+    select, button {
+      padding: 10px;
+      font-size: 1em;
+      margin: 10px 0;
+      border: 1px solid #008080;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #ffffff;
+      color: #008080;
+    }
+
+    select:hover, button:hover {
+      background-color: #006666;
+      color: #ffffff;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    ul li {
+      background-color: #ffffff;
+      color: #008080;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+  </style>
 </head>
 <body>
-    <h1>JIRA Worklog Details</h1>
-    <ul id="teamList">
-        <!-- List will be populated here -->
-    </ul>
+  <div class="container">
+    <h1>Hello, navsingh!</h1>
+    <h3>Select a Project</h3>
+    <select id="project-dropdown">
+      <option value="">-- Select Project --</option>
+    </select>
+    <h3>Select a Sprint</h3>
+    <select id="sprint-dropdown" disabled>
+      <option value="">-- Select Sprint --</option>
+    </select>
+    <h3>Issues in Sprint</h3>
+    <ul id="issues-list"></ul>
+    <h3>Issues in MOBL Sprint 26-Nov</h3>
+    <button id="fetch-issues-btn">Load Issues</button>
+    <ul id="mobl-issues-list"></ul>
+    <h2>Team Work Data</h2>
+    <ul id="teamList"></ul>
+  </div>
 
-    <script>
-        // Variables to store data
-        let name = [];
-        let timeSpent = [];
+  <script>
+    const projectDropdown = document.getElementById('project-dropdown');
+    const sprintDropdown = document.getElementById('sprint-dropdown');
+    const issuesList = document.getElementById('issues-list');
+    const name = []; // Array to store unique names
+    const timeSpent = []; // Array to store corresponding time spent
 
-        // Function to fetch data from JSON and store in variables
-        function fetchData() {
-            fetch('response.json')
-                .then(response => response.json())
-                .then(data => {
-                    // Clear previous data
-                    name = [];
-                    timeSpent = [];
+    // Fetch and populate projects in the dropdown
+    AP.request({
+      url: '/rest/api/3/project',
+      type: 'GET',
+      success: function(response) {
+        const projects = JSON.parse(response);
+        projects.forEach(project => {
+          const option = document.createElement('option');
+          option.value = project.key;
+          option.textContent = project.name;
+          projectDropdown.appendChild(option);
+        });
+      },
+      error: function(err) {
+        console.error('Error fetching projects:', err);
+      }
+    });
 
-                    // Extract data and store in variables
-                    data.issues.forEach(issue => {
-                        const assignee = issue.fields.assignee?.name || "Unassigned";
-                        const worklogs = issue.fields.worklog?.worklogs.timeSpent || [];
-                        
+    // Fetch and populate sprints when a project is selected
+    projectDropdown.addEventListener('change', function() {
+      const projectKey = this.value;
+      sprintDropdown.innerHTML = '<option value="">-- Select Sprint --</option>';
+      issuesList.innerHTML = '';
+      sprintDropdown.disabled = true;
 
-                        name.push(assignee);
-                        timeSpent.push(worklogs);
-                    });
+      if (!projectKey) return;
 
-                    // Call function to update HTML
-                    updateHTML();
-                })
-                .catch(error => console.error('Error fetching data:', error));
+      const boardUrl = `/rest/agile/1.0/board?projectKeyOrId=${projectKey}`;
+      AP.request({
+        url: boardUrl,
+        type: 'GET',
+        success: function(response) {
+          const boards = JSON.parse(response).values;
+          boards.forEach(board => {
+            fetchSprints(board.id);
+          });
+        },
+        error: function(err) {
+          console.error('Error fetching boards:', err);
         }
+      });
+    });
 
-        // Function to update HTML with data
-        function updateHTML() {
-            const teamList = document.getElementById('teamList');
-            teamList.innerHTML = ''; // Clear previous entries
-
-            name.forEach((person, index) => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `Name: ${person}, Time Spent: ${timeSpent[index]}h`;
-                teamList.appendChild(listItem);
+    function fetchSprints(boardId) {
+      const sprintUrl = `/rest/agile/1.0/board/${boardId}/sprint?state=active`;
+      AP.request({
+        url: sprintUrl,
+        type: 'GET',
+        success: function(response) {
+          const sprints = JSON.parse(response).values;
+          if (sprints.length > 0) {
+            sprintDropdown.disabled = false;
+            sprints.forEach(sprint => {
+              const option = document.createElement('option');
+              option.value = sprint.name;
+              option.textContent = sprint.name;
+              sprintDropdown.appendChild(option);
             });
+          }
+        },
+        error: function(err) {
+          console.error('Error fetching sprints:', err);
         }
+      });
+    }
+    
+    // New code
+    
+        // Fetch data from the JSON file
+     document.addEventListener('DOMContentLoaded', () => {
+        fetch('response.json') // Replace with actual file path if necessary
+            .then(response => response.json())
+            .then(data => {
+                // Clear existing data
+                name.length = 0;
+                timeSpent.length = 0;
 
-        // Call fetchData when the screen loads
-        window.onload = fetchData;
-    </script>
+                // Set to track unique assignees
+                const uniqueAssignees = new Set();
+
+                // Loop through all issues
+                data.issues.forEach(issue => {
+                    const assignee = issue.fields.assignee?.name || "Unassigned";
+                    const worklogs = issue.fields.worklog?.worklogs || [];
+
+                    // Calculate total time spent
+                    const totalTimeSpent = worklogs.reduce((total, log) => {
+                        return total + (log.timeSpent || 0);
+                    }, 0);
+
+                    // Add unique assignee to the set
+                    if (!uniqueAssignees.has(assignee)) {
+                        uniqueAssignees.add(assignee);
+                        name.push(assignee);
+                        timeSpent.push(totalTimeSpent);
+                    }
+                });
+
+                // Update the HTML with the unique assignees and their total time spent
+                updateHTML();
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Update the HTML to display the list
+    function updateHTML() {
+        const teamList = document.getElementById('teamList');
+        teamList.innerHTML = ''; // Clear previous entries
+
+        // Loop through the name array to display assignees and their time spent
+        name.forEach((person, index) => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `Name: ${person}, Time Spent: ${timeSpent[index]}h`;
+            teamList.appendChild(listItem);
+        });
+    }
+    
+    
+
+        // Get the button and issues list container
+    const fetchIssuesButton = document.getElementById('fetch-issues-btn');
+    const moblissuesList = document.getElementById('mobl-issues-list');
+
+    // Function to fetch and display issues
+    function displayIssues(data) {
+      // Clear the existing list
+      moblissuesList.innerHTML = '';
+
+      // Check if issues exist
+      if (data.issues && data.issues.length > 0) {
+        // Loop through the issues and display them
+        data.issues.forEach(issue => {
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <strong>${issue.key}</strong>: ${issue.fields.summary}
+            <br>Assignee: ${issue.fields.assignee ? issue.fields.assignee.displayName : 'Unassigned'}
+          `;
+          moblissuesList.appendChild(listItem);
+        });
+      } else {
+        // If no issues are available
+        moblissuesList.innerHTML = '<li>No issues found.</li>';
+      }
+    }
+
+    // Attach click event to the button
+    fetchIssuesButton.addEventListener('click', () => {
+      // Fetch the JSON data when the button is clicked
+      fetch('response.json') // Ensure `issues.json` is in the same directory as this HTML file
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Call display function with the fetched data
+          displayIssues(data);
+        })
+        .catch(error => {
+          console.error('Error loading JSON data:', error);
+          moblissuesList.innerHTML = '<li>Failed to load issues.</li>';
+        });
+    });
+
+    // Fetch and display issues when a sprint is selected
+    sprintDropdown.addEventListener('change', function() {
+      const projectName = projectDropdown.value;
+      const sprintName = this.value;
+      issuesList.innerHTML = '';
+
+      if (!sprintName) return;
+
+      const issuesUrl = `/rest/api/2/search?jql=project="${projectName}" AND sprint="${sprintName}"`;
+      AP.request({
+        url: issuesUrl,
+        type: 'GET',
+        success: function(response) {
+          const issues = JSON.parse(response).issues;
+          if (issues.length === 0) {
+            issuesList.innerHTML = '<li>No issues found for this sprint.</li>';
+            return;
+          }
+          issues.forEach(issue => {
+            const li = document.createElement('li');
+            li.textContent = `Key: ${issue.key}, Summary: ${issue.fields.summary}`;
+            issuesList.appendChild(li);
+          });
+        },
+        error: function(err) {
+          console.error('Error fetching issues:', err);
+          issuesList.innerHTML = '<li>Error fetching issues for this sprint.</li>';
+        }
+      });
+    });
+  </script>
 </body>
 </html>
+
+
