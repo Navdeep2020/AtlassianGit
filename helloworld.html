@@ -84,6 +84,7 @@
     const timeSpent = []; // Array to store corresponding time spent
     const blockedTickets = [];
     const carryForwardTickets = [];
+    const pullRequests = [];
     
     // New code
     
@@ -97,6 +98,7 @@
                 timeSpent.length = 0;
                 blockedTickets.length = 0;
                 carryForwardTickets.length = 0;
+                pullRequests.length = 0;
 
                 // Set to track unique assignees
                 const uniqueAssignees = new Set();
@@ -107,6 +109,7 @@
                     const worklogs = issue.fields.worklog?.worklogs || [];
                     const statusName = issue.fields.status?.name || "";
                     const sprintField = issue.fields.customfield_10104 || [];
+                    const prField = issue.fields.customfield_11201?.summaryBean?.summary?.pullrequest?.overall || {};
 
                     // Calculate total time spent in minutes
                     const totalTimeSpentInMinutes = worklogs.reduce((total, log) => {
@@ -115,6 +118,9 @@
 
                      // Check if issue is carry forward
                     const isCarryForward = sprintField.length > 1;
+
+                    // Get the PR count
+                     const prCount = prField.stateCount || 0;
             
                     // Add or update assignee data
                     if (!uniqueAssignees.has(assignee)) {
@@ -123,6 +129,7 @@
                       timeSpent.push(totalTimeSpentInMinutes);
                       blockedTickets.push(statusName === "Blocked" ? 1 : 0);
                       carryForwardTickets.push(isCarryForward ? 1 : 0);
+                      pullRequests.push(prCount);
                     } else {
                       const index = name.indexOf(assignee);
                       timeSpent[index] += totalTimeSpentInMinutes;
@@ -132,6 +139,7 @@
                       if (isCarryForward) {
                         carryForwardTickets[index]++;
                       }
+                      pullRequests[index] += prCount;
                     }
                   });
 
@@ -149,7 +157,7 @@
         // Loop through the name array to display assignees, their time spent, and blocked tickets
         name.forEach((person, index) => {
           const listItem = document.createElement('li');
-          listItem.textContent = `Name: ${person}, Time Spent: ${formatTimeSpent(timeSpent[index])}, Blocked Tickets: ${blockedTickets[index]}, Carry Forward Tickets: ${carryForwardTickets[index]}`;
+          listItem.textContent = `Name: ${person}, Time Spent: ${formatTimeSpent(timeSpent[index])}, Blocked Tickets: ${blockedTickets[index]}, Carry Forward Tickets: ${carryForwardTickets[index]}, PRs: ${pullRequests[index]}`;
           teamList.appendChild(listItem);
         });
       }
