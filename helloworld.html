@@ -74,21 +74,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Hello, navsingh!</h1>
-    <h3>Select a Project</h3>
-    <select id="project-dropdown">
-      <option value="">-- Select Project --</option>
-    </select>
-    <h3>Select a Sprint</h3>
-    <select id="sprint-dropdown" disabled>
-      <option value="">-- Select Sprint --</option>
-    </select>
-    <h3>Issues in Sprint</h3>
-    <ul id="issues-list"></ul>
-    <h3>Issues in MOBL Sprint 26-Nov</h3>
-    <button id="fetch-issues-btn">Load Issues</button>
-    <ul id="mobl-issues-list"></ul>
-    <h2>Team Work Data</h2>
+    <h1>Team Work Data</h2>
     <button id="fetch-sprint-data-btn">Fetch Sprint Data</button>
     <ul id="teamList"></ul>
   </div>
@@ -116,18 +102,18 @@
                     const assignee = issue.fields.assignee?.name || "Unassigned";
                     const worklogs = issue.fields.worklog?.worklogs || [];
 
-                    // Calculate total time spent
-                    const totalTimeSpent = worklogs.reduce((total, log) => {
-                        return total + (log.timeSpent || 0);
+                    // Calculate total time spent in minutes
+                    const totalTimeSpentInMinutes = worklogs.reduce((total, log) => {
+                      return total + parseTimeSpent(log.timeSpent || "0m");
                     }, 0);
 
-                    // Add unique assignee to the set
-                    if (!uniqueAssignees.has(assignee)) {
+                      // Add unique assignee to the set
+                      if (!uniqueAssignees.has(assignee)) {
                         uniqueAssignees.add(assignee);
                         name.push(assignee);
-                        timeSpent.push(totalTimeSpent);
-                    }
-                });
+                        timeSpent.push(formatTimeSpent(totalTimeSpentInMinutes));
+                      }
+                    });
 
                 // Update the HTML with the unique assignees and their total time spent
                 updateHTML();
@@ -149,7 +135,36 @@
     }
 
     document.getElementById('fetch-sprint-data-btn').addEventListener('click', fetchData);
-    
+
+
+    // Helper function to parse time strings like "2h 30m" or "1d 2h" into total minutes
+function parseTimeSpent(timeString) {
+  let totalMinutes = 0;
+
+  // Match patterns like "1d", "2h", "30m"
+  const timeParts = timeString.match(/(\d+d|\d+h|\d+m)/g);
+
+  if (timeParts) {
+    timeParts.forEach(part => {
+      if (part.includes('d')) {
+        totalMinutes += parseInt(part) * 24 * 60; // Convert days to minutes
+      } else if (part.includes('h')) {
+        totalMinutes += parseInt(part) * 60; // Convert hours to minutes
+      } else if (part.includes('m')) {
+        totalMinutes += parseInt(part); // Minutes
+      }
+    });
+  }
+
+  return totalMinutes;
+}
+
+// Helper function to format total minutes into "Xh Ym"
+function formatTimeSpent(totalMinutes) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours}h ${minutes}m`;
+}
   
     // Fetch and display issues when a sprint is selected
     sprintDropdown.addEventListener('change', function() {
