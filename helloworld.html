@@ -122,7 +122,7 @@
                     const isCarryForward = sprintField.length > 1;
 
                     // Get the PR count
-                    const prCount = prField?.summaryBean?.summary?.pullrequest?.overall?.stateCount;
+                    const prCount = prField?.summaryBean?.summary?.pullrequest?.overall?.stateCount || 0;
                     console.log(`PR count for ${assignee}:`, prCount);
             
                     // Add or update assignee data
