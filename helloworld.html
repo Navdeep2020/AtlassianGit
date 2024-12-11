@@ -84,6 +84,7 @@
         issues.forEach(issue => {
           const assignee = issue.fields.assignee?.displayName || "Unassigned";
           const worklogs = issue.fields.worklog?.worklogs || [];
+          const statusId = issue.fields.status?.id || "";
           const statusName = issue.fields.status?.name || "";
           const sprintField = issue.fields.customfield_10104 || [];
           const prField = issue.fields.customfield_11201?.summaryBean?.summary?.pullrequest?.overall || {};
@@ -96,7 +97,9 @@
               timeSpent: 0,
               blockedTickets: 0,
               carryForwardTickets: 0,
-              prs: 0
+              prs: 0,
+              yetToStart: 0,
+              completed: 0
             };
           }
 
@@ -106,6 +109,14 @@
           if (statusName === "Blocked") {
             teamData[assignee].blockedTickets += 1;
           }
+          
+          if (statusId === "1") { // Yet to Start
+            teamData[assignee].yetToStart += 1;
+          }
+          if (statusId === "6") { // Completed
+            teamData[assignee].completed += 1;
+          }
+          
           if (sprintField.length > 1) {
             teamData[assignee].carryForwardTickets += 1;
           }
@@ -135,6 +146,8 @@
         <p>Blocked Tickets: ${member.blockedTickets}</p>
         <p>Carry Forward Tickets: ${member.carryForwardTickets}</p>
         <p>PRs: ${member.prs}</p>
+        <p>Yet to Start: ${member.yetToStart}</p>
+        <p>Completed: ${member.completed}</p>
       `;
       container.appendChild(card);
     });
