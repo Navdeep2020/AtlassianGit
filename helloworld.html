@@ -73,65 +73,76 @@
 </div>
 
 <script>
-  // Fetch data from response.json
-  function fetchDataAndInitialize() {
-    fetch("response.json")
-      .then(response => response.json())
-      .then(data => {
-        const issues = data.issues || [];
-        const teamData = {};
+  
+// Fetch data from response.json
+function fetchDataAndInitialize() {
+  fetch("response.json")
+    .then(response => response.json())
+    .then(data => {
+      return fetch("epic_response.json")
+        .then(epicResponse => epicResponse.json())
+        .then(epicData => {
+          const issues = data.issues || [];
+          const epicIssues = epicData.issues || [];
+          const teamData = {};
 
-        issues.forEach(issue => {
-          const assignee = issue.fields.assignee?.displayName || "Unassigned";
-          const worklogs = issue.fields.worklog?.worklogs || [];
-          const statusId = issue.fields.status?.id || "";
-          const statusName = issue.fields.status?.name || "";
-          const sprintField = issue.fields.customfield_10104 || [];
-          const prField = issue.fields.customfield_11201?.summaryBean?.summary?.pullrequest?.overall || {};
-          const storyPoint = issue.fields.customfield_10102 || 0;
+          issues.forEach(issue => {
+            const assignee = issue.fields.assignee?.displayName || "Unassigned";
+            const worklogs = issue.fields.worklog?.worklogs || [];
+            const statusId = issue.fields.status?.id || "";
+            const sprintField = issue.fields.customfield_10104 || [];
+            const prField = issue.fields.customfield_11201?.summaryBean?.summary?.pullrequest?.overall || {};
+            const storyPoint = issue.fields.customfield_10102 || 0;
+            const epicKey = issue.fields.customfield_10106 || null;
 
-          if (!teamData[assignee]) {
-            teamData[assignee] = {
-              name: assignee,
-              storyPoints: 0,
-              completedStoryPoints: 0,
-              timeSpent: 0,
-              blockedTickets: 0,
-              carryForwardTickets: 0,
-              prs: 0,
-              yetToStart: 0,
-              completed: 0
-            };
-          }
+            if (!teamData[assignee]) {
+              teamData[assignee] = {
+                name: assignee,
+                storyPoints: 0,
+                completedStoryPoints: 0,
+                timeSpent: 0,
+                blockedTickets: 0,
+                carryForwardTickets: 0,
+                prs: 0,
+                yetToStart: 0,
+                completed: 0,
+                epics: []
+              };
+            }
 
-          // Aggregate data for each assignee
-          teamData[assignee].storyPoints += storyPoint;
-          teamData[assignee].timeSpent += worklogs.reduce((sum, log) => sum + log.timeSpentSeconds / 3600, 0); // Convert seconds to hours
-          if (statusName === "Blocked") {
-            teamData[assignee].blockedTickets += 1;
-          }
-          
-          if (statusId === "1") { // Yet to Start
-            teamData[assignee].yetToStart += 1;
-          }
-          if (statusId === "6") { // Completed
-            teamData[assignee].completed += 1;
-            teamData[assignee].completedStoryPoints += storyPoint;
-          }
-          
-          if (sprintField.length > 1) {
-            teamData[assignee].carryForwardTickets += 1;
-          }
-          teamData[assignee].prs += prField.total || 0;
+            teamData[assignee].storyPoints += storyPoint;
+            if (statusId === "6") {
+              teamData[assignee].completed += 1;
+              teamData[assignee].completedStoryPoints += storyPoint;
+            }
+            if (statusId === "1") {
+              teamData[assignee].yetToStart += 1;
+            }
+            if (statusId === "10002") {
+              teamData[assignee].blockedTickets += 1;
+            }
+            if (sprintField.length > 1) {
+              teamData[assignee].carryForwardTickets += 1;
+            }
+            teamData[assignee].prs += prField.total || 0;
+
+            if (epicKey) {
+              const matchingEpic = epicIssues.find(epic => epic.key === epicKey);
+              if (matchingEpic) {
+                const epicSummary = matchingEpic.fields.summary;
+                if (!teamData[assignee].epics.includes(epicSummary)) {
+                  teamData[assignee].epics.push(epicSummary);
+                }
+              }
+            }
+          });
+
+          const teamMembers = Object.values(teamData);
+          generateTeamMemberCards(teamMembers);
         });
-
-        // Convert teamData object to array and populate the UI
-        const teamMembers = Object.values(teamData);
-        generateTeamMemberCards(teamMembers);
-        renderPieCharts(teamMembers); // Render pie charts with the team member data
-      })
-      .catch(error => console.error("Error fetching data:", error));
-  }
+    })
+    .catch(error => console.error("Error fetching data:", error));
+}
 
   // Function to dynamically generate team member cards
   function generateTeamMemberCards(data) {
