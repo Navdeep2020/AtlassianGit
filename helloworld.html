@@ -161,6 +161,7 @@ function fetchDataAndInitialize() {
         <p>PRs: ${member.prs}</p>
         <p>Yet to Start: ${member.yetToStart}</p>
         <p>Completed: ${member.completed}</p>
+        <p>Epics: ${member.epics.length > 0 ? member.epics.join(", ") : "No Epics Assigned"}</p>
       `;
       container.appendChild(card);
     });
