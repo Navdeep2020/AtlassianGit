@@ -94,6 +94,7 @@
             teamData[assignee] = {
               name: assignee,
               storyPoints: 0,
+              completedStoryPoints: 0,
               timeSpent: 0,
               blockedTickets: 0,
               carryForwardTickets: 0,
@@ -115,6 +116,7 @@
           }
           if (statusId === "6") { // Completed
             teamData[assignee].completed += 1;
+            teamData[assignee].completedStoryPoints += storyPoint;
           }
           
           if (sprintField.length > 1) {
@@ -141,7 +143,7 @@
       card.className = 'team-card';
       card.innerHTML = `
         <h3>${member.name}</h3>
-        <div class="main-kpi">Story Points: ${member.storyPoints}</div>
+        <div class="main-kpi">Story Points: ${member.completedStoryPoints}/${member.storyPoints}</div>
         <p>Time Logged: ${member.timeSpent.toFixed(2)} hours</p>
         <p>Blocked Tickets: ${member.blockedTickets}</p>
         <p>Carry Forward Tickets: ${member.carryForwardTickets}</p>
