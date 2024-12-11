@@ -111,6 +111,7 @@ function fetchDataAndInitialize() {
             }
 
             teamData[assignee].storyPoints += storyPoint;
+            teamData[assignee].timeSpent += worklogs.reduce((sum, log) => sum + log.timeSpentSeconds / 3600, 0);
             if (statusId === "6") {
               teamData[assignee].completed += 1;
               teamData[assignee].completedStoryPoints += storyPoint;
