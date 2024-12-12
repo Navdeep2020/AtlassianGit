@@ -73,13 +73,17 @@
 </div>
 
 <script>
+
+// Variables for JSON file paths
+const responseJson = "response.json";
+const epicJson = "epic_response.json";  
   
 // Fetch data from response.json
 function fetchDataAndInitialize() {
-  fetch("response.json")
+  fetch(responseJson)
     .then(response => response.json())
     .then(data => {
-      return fetch("epic_response.json")
+      return fetch(epicJson)
         .then(epicResponse => epicResponse.json())
         .then(epicData => {
           const issues = data.issues || [];
