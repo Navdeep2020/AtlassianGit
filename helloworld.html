@@ -61,12 +61,13 @@
     }
 
     /* Charts container styling */
-    .charts-container {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      padding: 1rem 0;
-    }
+     .charts-container {
+        display: flex;
+        gap: 1rem; /* Reduced gap to minimize extra space */
+        justify-content: center;
+        align-items: flex-start; /* Aligns the epics' labels and the chart */
+        padding: 1rem 0;
+      }
 
     .charts-container div {
       flex: 1 1 300px;
@@ -129,13 +130,10 @@ function fetchDataAndInitialize() {
             const storyPoint = issue.fields.customfield_10102 || 0;
             const epicKey = issue.fields.customfield_10106 || null;
 
-            // Handle prField and extract stateCount
-            const prField = issue.fields.customfield_11201?.summaryBean?.summary?.pullrequest?.overall || {};
-            const stateCount = (() => {
-              const prSummaryString = JSON.stringify(prField);
-              const match = prSummaryString.match(/stateCount=(\d+)/);
-              return match ? parseInt(match[1], 10) : 0;
-            })();
+            const regex = /stateCount=(\d+)/;
+            const match = issue.fields.customfield_11201.match(regex);
+            const stateCount = match ? parseInt(match[1], 10) : 0;
+
 
             if (!teamData[assignee]) {
               teamData[assignee] = {
