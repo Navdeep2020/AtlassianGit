@@ -58,6 +58,26 @@
       font-weight: bold;
       margin-bottom: 0.5rem;
     }
+
+    /* Charts container styling */
+    .charts-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .charts-container div {
+      flex: 1 1 300px;
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .charts-container canvas {
+      max-width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -70,6 +90,14 @@
 <!-- Main Container -->
 <div class="container">
   <div id="team-members-container" class="team-member-grid"></div>
+
+  <!-- Charts -->
+  <div class="charts-container">
+    <div>
+      <h3>Epic Allocation</h3>
+      <canvas id="epic-allocation-chart"></canvas>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -89,6 +117,7 @@ function fetchDataAndInitialize() {
           const issues = data.issues || [];
           const epicIssues = epicData.issues || [];
           const teamData = {};
+          const epicAllocation = {};
 
           issues.forEach(issue => {
             const assignee = issue.fields.assignee?.displayName || "Unassigned";
@@ -138,12 +167,18 @@ function fetchDataAndInitialize() {
                 if (epicName && !teamData[assignee].epics.includes(epicName)) {
                   teamData[assignee].epics.push(epicName);
                 }
+                // Update epic allocation
+                  if (!epicAllocation[epicName]) {
+                    epicAllocation[epicName] = 0;
+                  }
+                  epicAllocation[epicName] += storyPoint;
               }
             }
           });
 
           const teamMembers = Object.values(teamData);
           generateTeamMemberCards(teamMembers);
+          renderEpicChart(epicAllocation);
         });
     })
     .catch(error => console.error("Error fetching data:", error));
@@ -171,6 +206,24 @@ function fetchDataAndInitialize() {
       container.appendChild(card);
     });
   }
+
+  // Function to render epic allocation pie chart
+function renderEpicChart(epicAllocation) {
+  const labels = Object.keys(epicAllocation);
+  const data = Object.values(epicAllocation);
+
+  const epicAllocationCtx = document.getElementById('epic-allocation-chart').getContext('2d');
+  new Chart(epicAllocationCtx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
+      }]
+    }
+  });
+}
 
   // Initialize the dashboard
   document.addEventListener('DOMContentLoaded', () => {
