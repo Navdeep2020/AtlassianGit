@@ -126,9 +126,16 @@ function fetchDataAndInitialize() {
             const worklogs = issue.fields.worklog?.worklogs || [];
             const statusId = issue.fields.status?.id || "";
             const sprintField = issue.fields.customfield_10104 || [];
-            const prField = issue.fields.customfield_11201?.summaryBean?.summary?.pullrequest?.overall || {};
             const storyPoint = issue.fields.customfield_10102 || 0;
             const epicKey = issue.fields.customfield_10106 || null;
+
+            // Handle prField and extract stateCount
+            const prField = issue.fields.customfield_11201?.summaryBean?.summary?.pullrequest?.overall || {};
+            const stateCount = (() => {
+              const prSummaryString = JSON.stringify(prField);
+              const match = prSummaryString.match(/stateCount=(\d+)/);
+              return match ? parseInt(match[1], 10) : 0;
+            })();
 
             if (!teamData[assignee]) {
               teamData[assignee] = {
@@ -160,7 +167,7 @@ function fetchDataAndInitialize() {
             if (sprintField.length > 1) {
               teamData[assignee].carryForwardTickets += 1;
             }
-            teamData[assignee].prs += prField.total || 0;
+            teamData[assignee].prs += stateCount;
 
             if (epicKey) {
               const matchingEpic = epicIssues.find(epic => epic.key === epicKey);
