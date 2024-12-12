@@ -25,6 +25,7 @@
       padding: 1rem 0;
       text-align: center;
       font-size: 1.5rem;
+      margin-bottom: 20px;
     }
 
     /* Main container wrapper */
@@ -355,6 +356,7 @@ function fetchDataAndInitialize() {
         <p>Yet to Start: ${member.yetToStart}</p>
         <p>Completed: ${member.completed}</p>
         <p>Epics: ${member.epics.length > 0 ? member.epics.join(", ") : "No Epics Assigned"}</p>
+        <p>Top 3 Tickets based on Time Spent: MOBL-6112, MOBL-6119, MOBL-6120</p>
       `;
       container.appendChild(card);
     });
