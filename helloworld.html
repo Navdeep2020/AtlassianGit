@@ -32,7 +32,68 @@
       padding: 1rem;
     }
 
-        /* Team Member Grid */
+    /* Sprint Summary Chat */
+    .chat-container {
+      max-width: 100%;
+      margin: 0 auto 1rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: #0078D4;
+      color: #fff;
+      padding: 15px 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .chat-content {
+      padding: 20px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 8px;
+      line-height: 1.5;
+    }
+
+    .bot-message {
+      background: #f0f7ff;
+      color: #333;
+      align-self: flex-start;
+    }
+
+    .chat-options {
+      margin-top: 20px;
+    }
+
+    .option-button {
+      display: block;
+      background: #0078D4;
+      color: #fff;
+      text-align: center;
+      padding: 10px 15px;
+      margin: 5px 0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    .option-button:hover {
+      background: #005FA0;
+    }
+    
+     /* Team Member Grid */
       .team-member-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
@@ -104,6 +165,24 @@
   JIRA KPI Dashboard
 </header>
 
+  <!-- Sprint Summary Chat -->
+<div class="chat-container">
+  <div class="chat-header">
+    Sprint Assistant
+  </div>
+  <div class="chat-content">
+    <div class="message bot-message">
+      Ask me anything about this sprint, or choose an option below:
+      <div class="chat-options">
+        <a href="#" class="option-button">Summarize by Epics</a>
+        <a href="#" class="option-button">Summarize by Assignee</a>
+        <a href="#" class="option-button">Summarize by Categories (Release, Development, Bugfixes)</a>
+        <a href="#" class="option-button">Summarize by TLAs</a>
+      </div>
+    </div>
+  </div>
+</div>
+  
 <!-- Main Container -->
 <div class="container">
   <div id="team-members-container" class="team-member-grid"></div>
