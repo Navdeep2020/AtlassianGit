@@ -187,18 +187,24 @@ function fetchDataAndInitialize() {
                 if (epicName && !teamData[assignee].epics.includes(epicName)) {
                   teamData[assignee].epics.push(epicName);
                 }
-                // Update epic allocation
+                // Update epic story points allocation
                   if (!epicAllocation[epicName]) {
                     epicAllocation[epicName] = 0;
                   }
                   epicAllocation[epicName] += storyPoint;
+
+                // Update epic assignee allocation
+                if (!epicAssigneeAllocation[epicName]) {
+                  epicAssigneeAllocation[epicName] = new Set(); // Using Set to ensure unique assignees
+                }
+                epicAssigneeAllocation[epicName].add(assignee);
               }
             }
           });
 
           const teamMembers = Object.values(teamData);
           generateTeamMemberCards(teamMembers);
-          renderEpicChart(epicAllocation);
+          renderEpicCharts(epicStoryPointsAllocation, epicAssigneeAllocation); 
         });
     })
     .catch(error => console.error("Error fetching data:", error));
@@ -227,19 +233,37 @@ function fetchDataAndInitialize() {
     });
   }
 
-function renderEpicChart(epicAllocation) {
-  // Convert epicAllocation object to labels and data arrays
-  const labels = Object.keys(epicAllocation);
-  const data = Object.values(epicAllocation);
+// Function to render both charts
+function renderEpicCharts(epicStoryPointsAllocation, epicAssigneeAllocation) {
+  // Convert epicStoryPointsAllocation object to labels and data arrays
+  const storyPointsLabels = Object.keys(epicStoryPointsAllocation);
+  const storyPointsData = Object.values(epicStoryPointsAllocation);
 
-  // Update chart with the processed data
-  const epicAllocationCtx = document.getElementById('epic-allocation-chart').getContext('2d');
-  new Chart(epicAllocationCtx, {
+  // Convert epicAssigneeAllocation object to labels and data arrays (number of assignees)
+  const assigneeLabels = Object.keys(epicAssigneeAllocation);
+  const assigneeData = assigneeLabels.map(epic => epicAssigneeAllocation[epic].size);
+
+  // Render Epic Story Points Allocation Pie Chart
+  const epicStoryPointsCtx = document.getElementById('epic-allocation-chart').getContext('2d');
+  new Chart(epicStoryPointsCtx, {
     type: 'pie',
     data: {
-      labels: labels, // Use the labels array here
+      labels: storyPointsLabels,
       datasets: [{
-        data: data, // Use the data array here
+        data: storyPointsData,
+        backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
+      }]
+    }
+  });
+
+  // Render Epic Assignee Allocation Pie Chart
+  const epicAssigneeCtx = document.getElementById('epic-assignee-allocation-chart').getContext('2d');
+  new Chart(epicAssigneeCtx, {
+    type: 'pie',
+    data: {
+      labels: assigneeLabels,
+      datasets: [{
+        data: assigneeData,
         backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
       }]
     }
