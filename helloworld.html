@@ -5,6 +5,7 @@
   <title>Your Connect App</title>
   <script src="https://connect-cdn.atl-paas.net/all.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     /* Overall page styling */
   * {
@@ -193,6 +194,25 @@
     .section {
        margin-bottom: 30px;
     }
+
+    .bar-graph {
+            height: 100px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .bar {
+            width: 15px;
+            background-color: #3f51b5;
+            border-radius: 3px;
+            transition: height 0.3s ease;
+        }
+
+        .bar:hover {
+            background-color: #1e88e5;
+        }
+    
   </style>
 </head>
 <body>
@@ -289,12 +309,11 @@ function fetchDataAndInitialize() {
             const match = issue.fields.customfield_11201.match(regex);
             const stateCount = match ? parseInt(match[1], 10) : 0;
 
-          // Process worklog data to calculate daily totals
-          const dailyTimeLogs = worklogs.reduce((acc, log) => {
+             const dailyTimeLogs = worklogs.reduce((acc, log) => {
               const date = new Date(log.created).toISOString().split('T')[0]; // Extract date
               acc[date] = (acc[date] || 0) + log.timeSpentSeconds / 3600; // Convert seconds to hours
               return acc;
-          }, {});
+            }, {});
 
             teamData[assignee].storyPoints += storyPoint;
             teamData[assignee].timeSpent += worklogs.reduce((sum, log) => sum + log.timeSpentSeconds / 3600, 0);
