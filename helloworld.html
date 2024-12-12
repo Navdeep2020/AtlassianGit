@@ -406,60 +406,37 @@ function renderEpicChart(epicAllocation) {
   });
 }
 
-// Function to render the time log bar chart
 function renderBieGraph(dailyTimeLogs) {
-  const ctx = document.getElementById("timeLogBarChart").getContext("2d");
+  // Convert dailyTimeLogs into arrays for chart.js
+  const sortedDates = Object.keys(dailyTimeLogs).sort((a, b) => new Date(a) - new Date(b)); // Sort dates from start to end
+  const timeLogs = sortedDates.map(date => dailyTimeLogs[date]);
 
-  // Destroy existing chart instance if it exists
-  if (window.timeLogBarChartInstance) {
-    window.timeLogBarChartInstance.destroy();
-  }
-
-  // Prepare data for the chart
-  const labels = Object.keys(dailyTimeLogs); // Dates
-  const data = Object.values(dailyTimeLogs); // Hours logged
-
-  // Chart.js configuration
-  window.timeLogBarChartInstance = new Chart(ctx, {
-    type: "bar",
+  const ctx = document.getElementById('timeLogBarChart').getContext('2d');
+  
+  // Render the chart using Chart.js
+  new Chart(ctx, {
+    type: 'bar',
     data: {
-      labels: labels,
-      datasets: [
-        {
-          label: "Hours Logged Per Day",
-          data: data,
-          backgroundColor: "rgba(54, 162, 235, 0.6)", // Bar color
-          borderColor: "rgba(54, 162, 235, 1)",
-          borderWidth: 1,
-        },
-      ],
+      labels: sortedDates, // Sorted dates
+      datasets: [{
+        label: 'Time Spent (hours)',
+        data: timeLogs,
+        backgroundColor: '#3f51b5',
+        borderColor: '#1e88e5',
+        borderWidth: 1
+      }]
     },
     options: {
       responsive: true,
-      plugins: {
-        legend: {
-          display: true,
-          position: "top",
-        },
-      },
       scales: {
-        x: {
-          title: {
-            display: true,
-            text: "Dates",
-          },
-        },
         y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Hours Logged",
-          },
-        },
-      },
-    },
+          beginAtZero: true
+        }
+      }
+    }
   });
 }
+
   // Initialize the dashboard
   document.addEventListener('DOMContentLoaded', () => {
     fetchDataAndInitialize();
