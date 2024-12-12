@@ -379,39 +379,60 @@ function renderEpicChart(epicAllocation) {
   });
 }
 
-  function renderBieGraph(dailyTimeLogs) {
-// Prepare data for the bar chart
-    const labels = Object.keys(dailyTimeLogs); // Dates as labels
-    const data = Object.values(dailyTimeLogs); // Time logged in hours
+// Function to render the time log bar chart
+function renderBieGraph(dailyTimeLogs) {
+  const ctx = document.getElementById("timeLogBarChart").getContext("2d");
 
-    // Create the bar chart
-    const timeLogBarChart = new Chart(document.getElementById('timeLogBarChart'), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Time Logged (hours)',
-                data: data,
-                backgroundColor: '#3f51b5',
-            }]
+  // Destroy existing chart instance if it exists
+  if (window.timeLogBarChartInstance) {
+    window.timeLogBarChartInstance.destroy();
+  }
+
+  // Prepare data for the chart
+  const labels = Object.keys(dailyTimeLogs); // Dates
+  const data = Object.values(dailyTimeLogs); // Hours logged
+
+  // Chart.js configuration
+  window.timeLogBarChartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Hours Logged Per Day",
+          data: data,
+          backgroundColor: "rgba(54, 162, 235, 0.6)", // Bar color
+          borderColor: "rgba(54, 162, 235, 1)",
+          borderWidth: 1,
         },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    title: { display: true, text: 'Date' }
-                },
-                y: {
-                    title: { display: true, text: 'Hours Logged' },
-                    beginAtZero: true,
-                    max: 50 // Set maximum Y-axis value
-                }
-            }
-        }
-    });
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+          position: "top",
+        },
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: "Dates",
+          },
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "Hours Logged",
+          },
+        },
+      },
+    },
+  });
 }
-
-
   // Initialize the dashboard
   document.addEventListener('DOMContentLoaded', () => {
     fetchDataAndInitialize();
