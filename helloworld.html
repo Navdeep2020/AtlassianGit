@@ -281,6 +281,7 @@ function fetchDataAndInitialize() {
           const epicIssues = epicData.issues || [];
           const teamData = {};
           const epicAllocation = {};
+           const dailyTimeLogs = {};
 
           issues.forEach(issue => {
             const assignee = issue.fields.assignee?.displayName || "Unassigned";
@@ -309,11 +310,10 @@ function fetchDataAndInitialize() {
             const match = issue.fields.customfield_11201.match(regex);
             const stateCount = match ? parseInt(match[1], 10) : 0;
 
-             const dailyTimeLogs = worklogs.reduce((acc, log) => {
+             worklogs.forEach(log => {
               const date = new Date(log.created).toISOString().split('T')[0]; // Extract date
-              acc[date] = (acc[date] || 0) + log.timeSpentSeconds / 3600; // Convert seconds to hours
-              return acc;
-            }, {});
+              dailyTimeLogs[date] = (dailyTimeLogs[date] || 0) + log.timeSpentSeconds / 3600; // Convert seconds to hours
+            });
 
             teamData[assignee].storyPoints += storyPoint;
             teamData[assignee].timeSpent += worklogs.reduce((sum, log) => sum + log.timeSpentSeconds / 3600, 0);
@@ -351,7 +351,13 @@ function fetchDataAndInitialize() {
           const teamMembers = Object.values(teamData);
           generateTeamMemberCards(teamMembers);
           renderEpicChart(epicAllocation);
-          renderBieGraph(dailyTimeLogs);
+
+          // Check if dailyTimeLogs has data before rendering
+          if (Object.keys(dailyTimeLogs).length > 0) {
+            renderBieGraph(dailyTimeLogs);
+          } else {
+            console.warn('No time log data available.');
+          }
         });
     })
     .catch(error => console.error("Error fetching data:", error));
@@ -375,7 +381,7 @@ function fetchDataAndInitialize() {
         <p>Yet to Start: ${member.yetToStart}</p>
         <p>Completed: ${member.completed}</p>
         <p>Epics: ${member.epics.length > 0 ? member.epics.join(", ") : "No Epics Assigned"}</p>
-        <p>Top 3 Tickets based on Time Spent: MOBL-6112, MOBL-6119, MOBL-6120</p>
+        <p>Top 3 Tickets: MOBL-6112, MOBL-6119, MOBL-6120</p>
       `;
       container.appendChild(card);
     });
