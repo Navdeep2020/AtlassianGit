@@ -32,33 +32,47 @@
       padding: 1rem;
     }
 
-    /* Team Member Grid */
-    .team-member-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-      padding-bottom: 1rem;
-    }
+        /* Team Member Grid */
+      .team-member-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+        gap: 1rem;
+        padding-bottom: 1rem;
+      }
+      
+      /* Team Member Card Style */
+      .team-card {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+        padding: 1rem;
+        text-align: left;
+      }
+      
+      .team-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .team-card .main-kpi {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+      
+      /* Responsive Design: Adjust grid layout on smaller screens */
+      @media (max-width: 768px) {
+        .team-member-grid {
+          grid-template-columns: repeat(2, 1fr); /* 2 cards per row on smaller screens */
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .team-member-grid {
+          grid-template-columns: 1fr; /* 1 card per row on very small screens */
+        }
+      }
 
-    /* Team Member Card Style */
-    .team-card {
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      background-color: #ffffff;
-      padding: 1rem;
-      text-align: left;
-    }
-
-    .team-card h3 {
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .team-card .main-kpi {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-    }
 
     /* Charts container styling */
      .charts-container {
@@ -144,11 +158,9 @@ function fetchDataAndInitialize() {
                 epics: []
               };
             }
-            
-
-            const prField = issue.fields.customfield_11201?.summaryBean?.summary?.pullrequest?.overall || {};
+          
             const regex = /stateCount=(\d+)/;
-            const match = JSON.stringify(prField).match(regex);
+            const match = issue.fields.customfield_11201.match(regex);
             const stateCount = match ? parseInt(match[1], 10) : 0;
 
             teamData[assignee].storyPoints += storyPoint;
