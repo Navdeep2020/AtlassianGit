@@ -134,9 +134,9 @@ function fetchDataAndInitialize() {
             if (epicKey) {
               const matchingEpic = epicIssues.find(epic => epic.key === epicKey);
               if (matchingEpic) {
-                const epicSummary = matchingEpic.fields.summary;
-                if (!teamData[assignee].epics.includes(epicSummary)) {
-                  teamData[assignee].epics.push(epicSummary);
+                const epicName = matchingEpic.fields.customfield_10105;
+                if (epicName && !teamData[assignee].epics.includes(epicName)) {
+                  teamData[assignee].epics.push(epicName);
                 }
               }
             }
