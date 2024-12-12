@@ -188,6 +188,10 @@
       max-width: 400px;
       height: 300px;
     }
+    
+    .section {
+       margin-bottom: 30px;
+    }
   </style>
 </head>
 <body>
@@ -222,6 +226,12 @@
 <!-- Main Container -->
 <div class="container">
   <div id="team-members-container" class="team-member-grid"></div>
+
+          <!-- Team - Time Log Section -->
+        <div class="section" id="time-log">
+            <h2>Team - Time Log</h2>
+            <canvas id="timeLogBarChart"></canvas>
+        </div>
 
   <!-- Charts -->
   <div class="charts-container">
@@ -278,6 +288,13 @@ function fetchDataAndInitialize() {
             const match = issue.fields.customfield_11201.match(regex);
             const stateCount = match ? parseInt(match[1], 10) : 0;
 
+          // Process worklog data to calculate daily totals
+          const dailyTimeLogs = worklogs.reduce((acc, log) => {
+              const date = new Date(log.created).toISOString().split('T')[0]; // Extract date
+              acc[date] = (acc[date] || 0) + log.timeSpentSeconds / 3600; // Convert seconds to hours
+              return acc;
+          }, {});
+
             teamData[assignee].storyPoints += storyPoint;
             teamData[assignee].timeSpent += worklogs.reduce((sum, log) => sum + log.timeSpentSeconds / 3600, 0);
             if (statusId === "6") {
@@ -314,6 +331,7 @@ function fetchDataAndInitialize() {
           const teamMembers = Object.values(teamData);
           generateTeamMemberCards(teamMembers);
           renderEpicChart(epicAllocation);
+          renderBieGraph(dailyTimeLogs);
         });
     })
     .catch(error => console.error("Error fetching data:", error));
@@ -359,6 +377,38 @@ function renderEpicChart(epicAllocation) {
       }]
     }
   });
+}
+
+  function renderBieGraph(dailyTimeLogs) {
+// Prepare data for the bar chart
+    const labels = Object.keys(dailyTimeLogs); // Dates as labels
+    const data = Object.values(dailyTimeLogs); // Time logged in hours
+
+    // Create the bar chart
+    const timeLogBarChart = new Chart(document.getElementById('timeLogBarChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Time Logged (hours)',
+                data: data,
+                backgroundColor: '#3f51b5',
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Date' }
+                },
+                y: {
+                    title: { display: true, text: 'Hours Logged' },
+                    beginAtZero: true,
+                    max: 50 // Set maximum Y-axis value
+                }
+            }
+        }
+    });
 }
 
 
