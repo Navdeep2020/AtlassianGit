@@ -70,7 +70,7 @@
       }
 
     .charts-container div {
-      flex: 1 1 300px;
+      flex: 1 1 100px;
       background: white;
       border-radius: 8px;
       padding: 1rem;
@@ -130,11 +130,6 @@ function fetchDataAndInitialize() {
             const storyPoint = issue.fields.customfield_10102 || 0;
             const epicKey = issue.fields.customfield_10106 || null;
 
-            const regex = /stateCount=(\d+)/;
-            const match = issue.fields.customfield_11201.match(regex);
-            const stateCount = match ? parseInt(match[1], 10) : 0;
-
-
             if (!teamData[assignee]) {
               teamData[assignee] = {
                 name: assignee,
@@ -149,6 +144,12 @@ function fetchDataAndInitialize() {
                 epics: []
               };
             }
+            
+
+            const prField = issue.fields.customfield_11201?.summaryBean?.summary?.pullrequest?.overall || {};
+            const regex = /stateCount=(\d+)/;
+            const match = JSON.stringify(prField).match(regex);
+            const stateCount = match ? parseInt(match[1], 10) : 0;
 
             teamData[assignee].storyPoints += storyPoint;
             teamData[assignee].timeSpent += worklogs.reduce((sum, log) => sum + log.timeSpentSeconds / 3600, 0);
