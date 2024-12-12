@@ -114,10 +114,6 @@
       <h3>Epic Allocation</h3>
       <canvas id="epic-allocation-chart"></canvas>
     </div>
-    <div>
-      <h3>Epic Assignee Allocation</h3>
-      <canvas id="epic-assignee-allocation-chart"></canvas>
-    </div>
   </div>
 </div>
 
@@ -196,18 +192,13 @@ function fetchDataAndInitialize() {
                     epicAllocation[epicName] = 0;
                   }
                   epicAllocation[epicName] += storyPoint;
-
-                  if (!epicAssigneeAllocation[epicName]) {
-                      epicAssigneeAllocation[epicName] = new Set(); // Using Set to ensure unique assignees
-                  }
-                 epicAssigneeAllocation[epicName].add(assignee);
               }
             }
           });
 
           const teamMembers = Object.values(teamData);
           generateTeamMemberCards(teamMembers);
-          renderEpicChart(epicAllocation, epicAssigneeAllocation);
+          renderEpicChart(epicAllocation);
         });
     })
     .catch(error => console.error("Error fetching data:", error));
@@ -241,9 +232,6 @@ function renderEpicChart(epicAllocation) {
   const labels = Object.keys(epicAllocation);
   const data = Object.values(epicAllocation);
 
-  const assigneeLabels = Object.keys(epicAssigneeAllocation);
-  const assigneeData = assigneeLabels.map(epic => epicAssigneeAllocation[epic].size);
-
   // Update chart with the processed data
   const epicAllocationCtx = document.getElementById('epic-allocation-chart').getContext('2d');
   new Chart(epicAllocationCtx, {
@@ -256,18 +244,6 @@ function renderEpicChart(epicAllocation) {
       }]
     }
   });
-
-    const epicAssigneeCtx = document.getElementById('epic-assignee-allocation-chart').getContext('2d');
-      new Chart(epicAssigneeCtx, {
-        type: 'pie',
-        data: {
-          labels: assigneeLabels,
-          datasets: [{
-            data: assigneeData,
-            backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
-          }]
-        }
-      });
 }
 
 
