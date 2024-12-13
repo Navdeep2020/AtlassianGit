@@ -541,26 +541,44 @@
       const assigneeLabels = Object.keys(epicAssigneeAllocation);
       const assigneeData = assigneeLabels.map(epic => epicAssigneeAllocation[epic].size);
 
-      const epicAssigneeCtx  = document.getElementById('epic-assignee-allocation-chart').getContext('2d');
-      new Chart(epicAssigneeCtx, {
-        type: 'pie',
-        data: {
-          labels: assigneeLabels, // Use the labels array here
-          datasets: [{
-            data: assigneeData, // Use the data array here
-            backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
-          }]
-        },
-        options: {
-          layout: {
-            padding: 0 // Removes padding around the chart
-          },
-          maintainAspectRatio: true, // Maintains the default aspect ratio
-          aspectRatio: 1, // Ensures a square canvas for the pie chart
-          responsive: true // Ensures the chart resizes with its container
-        }
+        // Create a mapping for tooltip display
+      const tooltipData = assigneeLabels.map(epic => {
+        const assignees = Array.from(epicAssigneeAllocation[epic]); // Convert Set to Array
+        return assignees.join(', '); // Join assignee names with commas
       });
-    }
+
+    const epicAssigneeCtx = document.getElementById('epic-assignee-allocation-chart').getContext('2d');
+    new Chart(epicAssigneeCtx, {
+      type: 'pie',
+      data: {
+        labels: assigneeLabels, // Use the labels array here
+        datasets: [{
+          data: assigneeData, // Use the data array here
+          backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
+        }]
+      },
+      options: {
+        layout: {
+          padding: 0 // Removes padding around the chart
+        },
+        maintainAspectRatio: true, // Maintains the default aspect ratio
+        aspectRatio: 1, // Ensures a square canvas for the pie chart
+        responsive: true, // Ensures the chart resizes with its container
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(tooltipItem) {
+                // Fetch assignee names for the hovered slice
+                const epic = assigneeLabels[tooltipItem.dataIndex];
+                const assignees = tooltipData[tooltipItem.dataIndex];
+                return `${epic}: ${assignees}`;
+              }
+            }
+          }
+        }
+      }
+    });
+ }
 
     function renderBieGraph(dailyTimeLogs) {
       // Convert dailyTimeLogs into arrays for chart.js
