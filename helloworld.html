@@ -251,6 +251,34 @@
     .bar:hover {
       background-color: #1e88e5;
     }
+
+    /* Drop Downs */
+   .dropdown-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .dropdown {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .dropdown:last-child {
+            margin-right: 0;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    
   </style>
 </head>
 
@@ -264,6 +292,26 @@
 
   <!-- Main Container -->
   <div class="container">
+
+        <div class="dropdown-container">
+            <div class="dropdown">
+                <label for="team-selector">Select Team:</label>
+                <select id="team-selector">
+                    <option value="team-a">Team A</option>
+                    <option value="team-b">Team B</option>
+                    <option value="team-c">Team C</option>
+                </select>
+            </div>
+            <div class="dropdown">
+                <label for="sprint-selector">Select Sprint:</label>
+                <select id="sprint-selector">
+                    <option value="sprint-1">Sprint 1</option>
+                    <option value="sprint-2">Sprint 2</option>
+                    <option value="sprint-3">Sprint 3</option>
+                </select>
+            </div>  
+        </div>
+          
     <!-- Sprint Summary Chat -->
     <div class="chat-container">
       <div class="chat-header">
