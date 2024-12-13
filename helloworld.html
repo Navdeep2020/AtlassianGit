@@ -468,12 +468,7 @@
                     if (!epicAssigneeAllocation[epicName]) {
                       epicAssigneeAllocation[epicName] = new Set(); // Using Set to ensure unique assignees
                     }
-                    epicAssigneeAllocation[epicName].add(assignee);
-
-                       // Convert sets to arrays for rendering
-                      Object.keys(epicAssigneeAllocation).forEach(epicKey => {
-                        epicAssigneeAllocation[epicKey] = Array.from(epicAssigneeAllocation[epicKey]);
-                      });
+                    epicAssigneeAllocation[epicName].add(assignee)
                   }
                 }
               });
@@ -544,7 +539,7 @@
       });
 
       const assigneeLabels = Object.keys(epicAssigneeAllocation);
-      const assigneeData = assigneeLabels.map(assigneeLabels => epicAssigneeAllocation[assigneeLabels].length);
+      const assigneeData = assigneeLabels.map(epic => epicAssigneeAllocation[epic].size);
 
       const epicAssigneeCtx  = document.getElementById('epic-assignee-allocation-chart').getContext('2d');
       new Chart(epicAssigneeCtx, {
@@ -560,17 +555,6 @@
           layout: {
             padding: 0 // Removes padding around the chart
           },
-        plugins: {
-        tooltip: {
-          callbacks: {
-            // Customize tooltip to show assignee names
-            label: function(context) {
-              const epic = context.label;
-              const assignees = epicAssigneeAllocation[epic] || [];
-              return `Assignees: ${assignees.join(", ")}`;
-            }
-          }
-        },
           maintainAspectRatio: true, // Maintains the default aspect ratio
           aspectRatio: 1, // Ensures a square canvas for the pie chart
           responsive: true // Ensures the chart resizes with its container
