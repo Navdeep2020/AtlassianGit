@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Your Connect App</title>
   <script src="https://connect-cdn.atl-paas.net/all.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     /* Overall page styling */
-  * {
+    * {
       box-sizing: border-box;
     }
 
@@ -26,18 +27,16 @@
       padding: 1rem 0;
       text-align: center;
       font-size: 1.5rem;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     /* Main container wrapper */
     .container {
-      padding: 1rem;
+      padding: 2rem;
     }
 
     /* Sprint Summary Chat */
     .chat-container {
-      max-width: 100%;
-      margin: 0 auto 1rem;
       background: #fff;
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -59,7 +58,7 @@
       flex-grow: 1;
       overflow-y: auto;
     }
-    
+
     .message {
       margin: 10px 0;
       padding: 15px;
@@ -73,13 +72,19 @@
       align-self: flex-start;
     }
 
+    .user-message {
+      background: #0078D4;
+      color: #fff;
+      align-self: flex-end;
+    }
+
     .chat-options {
       margin-top: 20px;
     }
 
     .option-button {
       display: block;
-      background: #0078D4;
+      background: #005FA0;
       color: #fff;
       text-align: center;
       padding: 10px 15px;
@@ -92,96 +97,125 @@
     }
 
     .option-button:hover {
-      background: #005FA0;
+      background: #004080;
     }
 
-        .chat-input {
-      display: flex;
-      align-items: center;
-      border-top: 1px solid #e0e0e0;
-      padding: 10px;
+    .chat-input {
+      padding: 15px;
       background: #f9f9f9;
+      display: flex;
+      border-top: 1px solid #ddd;
     }
 
     .chat-input textarea {
       flex-grow: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 14px;
       resize: none;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 16px;
+      outline: none;
     }
 
     .chat-input button {
-      margin-left: 10px;
-      padding: 10px 20px;
       background: #0078D4;
-      color: white;
+      color: #fff;
       border: none;
-      border-radius: 4px;
+      padding: 10px 15px;
+      margin-left: 10px;
+      border-radius: 5px;
       cursor: pointer;
-      font-size: 14px;
     }
 
     .chat-input button:hover {
       background: #005FA0;
     }
-    
-     /* Team Member Grid */
-      .team-member-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
-        gap: 1rem;
-        padding-bottom: 1rem;
-      }
-      
-      /* Team Member Card Style */
-      .team-card {
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        background-color: #ffffff;
-        padding: 1rem;
-        text-align: left;
-      }
-      
-      .team-card h3 {
-        font-size: 1.2rem;
-        margin-bottom: 0.5rem;
-      }
-      
-      .team-card .main-kpi {
-        font-size: 1.2rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-      }
-      
-      /* Responsive Design: Adjust grid layout on smaller screens */
-      @media (max-width: 768px) {
-        .team-member-grid {
-          grid-template-columns: repeat(2, 1fr); /* 2 cards per row on smaller screens */
-        }
-      }
-      
-      @media (max-width: 480px) {
-        .team-member-grid {
-          grid-template-columns: 1fr; /* 1 card per row on very small screens */
-        }
-      }
 
-/* Charts container styling */
-     .charts-container {
-      display: flex;
-      gap: 2rem; /* Space between the two charts */
-      justify-content: center; /* Center aligns the two charts */
-      align-items: flex-start; /* Align charts to the top of the container */
-      padding: 1rem 0;
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+
+    .team-timelog-container {
+      max-width: 800px;
+      /* Adjust the max width as needed */
+      margin: 0 auto;
+      /* Center the container */
+    }
+
+    #timeLogBarChart {
+      width: 100%;
+      /* Ensure the chart scales within the container */
+      height: auto;
+      /* Maintain aspect ratio */
+    }
+
+    /* Team Member Grid */
+    .team-member-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      /* 3 cards per row */
+      gap: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    /* Team Member Card Style */
+    .team-card {
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: #ffffff;
+      padding: 1rem;
+      text-align: left;
+    }
+
+    .team-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .team-card .main-kpi {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Responsive Design: Adjust grid layout on smaller screens */
+    @media (max-width: 768px) {
+      .team-member-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 cards per row on smaller screens */
       }
+    }
+
+    @media (max-width: 480px) {
+      .team-member-grid {
+        grid-template-columns: 1fr;
+        /* 1 card per row on very small screens */
+      }
+    }
+
+    /* Charts container styling */
+    .pie-charts-container {
+      display: flex;
+      gap: 2rem;
+      /* Space between the two charts */
+      justify-content: center;
+      /* Center aligns the two charts */
+      align-items: flex-start;
+      /* Align charts to the top of the container */
+      padding: 1rem 0;
+    }
 
     .chart-wrapper {
       display: flex;
-      flex-direction: column; /* Stack heading and chart vertically */
-      gap: 1rem; /* Space between <h3> and <canvas> */
-      align-items: center; /* Center align heading and chart */
+      flex-direction: column;
+      /* Stack heading and chart vertically */
+      gap: 1rem;
+      /* Space between <h3> and <canvas> */
+      align-items: center;
+      /* Center align heading and chart */
       background: white;
       border-radius: 8px;
       padding: 1rem;
@@ -189,196 +223,227 @@
     }
 
     .chart-wrapper canvas {
-      max-width: 300px; /* Adjust as needed */
-      height: 300px; /* Ensures consistent height */
+      max-width: 300px;
+      /* Adjust as needed */
+      height: 300px;
+      /* Ensures consistent height */
       display: block;
     }
-    
+
     .section {
-       margin-bottom: 30px;
+      margin-bottom: 30px;
     }
 
     .bar-graph {
-            height: 100px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-        }
+      height: 100px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
 
-        .bar {
-            width: 15px;
-            background-color: #3f51b5;
-            border-radius: 3px;
-            transition: height 0.3s ease;
-        }
+    .bar {
+      width: 15px;
+      background-color: #3f51b5;
+      border-radius: 3px;
+      transition: height 0.3s ease;
+    }
 
-        .bar:hover {
-            background-color: #1e88e5;
-        }
-    
+    .bar:hover {
+      background-color: #1e88e5;
+    }
   </style>
 </head>
+
 <body>
 
-<!-- Header -->
-<header>
-  JIRA KPI Dashboard
-</header>
+  <!-- Header -->
+  <header>
+    JIRA Sprint Assistant
+  </header>
 
-<!-- Sprint Summary Chat -->
-<div class="chat-container">
-  <div class="chat-header">
-    Sprint Assistant
-  </div>
-  <div class="chat-content">
-    <div class="message bot-message">
-      Ask me anything about this sprint, or choose an option below:
-      <div class="chat-options">
-        <a href="#" class="option-button">Summarize by Epics</a>
-        <a href="#" class="option-button">Summarize by Assignee</a>
-        <a href="#" class="option-button">Summarize by Categories (Release, Development, Bugfixes)</a>
-        <a href="#" class="option-button">Summarize by TLAs</a>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Sprint Summary Chat -->
+    <div class="chat-container">
+      <div class="chat-header">
+        Sprint Q&A
+      </div>
+      <div class="chat-content">
+        <div class="message bot-message">
+          Ask me anything about this sprint, or choose an option below:
+          <div class="chat-options">
+            <a href="#" class="option-button" style="background: #005FA0;">Summarize by Epics</a>
+            <a href="#" class="option-button">Summarize by Assignee</a>
+            <a href="#" class="option-button">Summarize by Categories (Release, Development, Bugfixes)</a>
+            <a href="#" class="option-button">Summarize by TLAs</a>
+          </div>
+        </div>
+        <div class="message user-message">
+          Summarize by Epics
+        </div>
+        <div class="message bot-message">
+          <pre>{
+    "Epics": [
+        {
+            "Epic": "iOS Mobile CP App",
+            "jira-issues": [
+                "MOBL-6070: Released CMKY, ANGA, and TGAZ brand apps on the App Store, verified by QA and made live by nrajput with screenshots provided.",
+                "MOBL-6062: Released five HRST brand apps, handled installation, login, and submission for Apple review by nrajput.",
+                "MOBL-6040: Rebased five HRST brands with SDK v3.2.0 by navsingh, tested by Ajsharma, confirming operational status.",
+                "MOBL-6039: Updated ANGA to SDK v3.2.0, tested successfully by navsingh.",
+                "MOBL-6038: Updated CMKY to SDK v3.2.0, confirmed functional by ajsharma.",
+                "MOBL-6037: Updated TGAZ to SDK v3.2.0, tested by navsingh and ajsharma despite some account testing issues."
+            ]
+        }
+    ]
+}</pre>
+        </div>
+      </div>
+      <div class="chat-input">
+        <textarea rows="1" placeholder="Type your message..."></textarea>
+        <button>Send</button>
+      </div>
+    </div>
+
+    <!-- Team - Time Log Section -->
+    <div class="section">
+      <h2>Team - Time Log</h2>
+      <p>Day wise time logged by whole team in this sprint.</p><br />
+      <div class="team-timelog-container">
+        <canvas id="timeLogBarChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Team - Time Log Section -->
+    <div class="section">
+      <h2>Team Score Cards</h2>
+      <div id="team-members-container" class="team-member-grid"></div>
+    </div>
+
+
+    <!-- Charts -->
+    <div class="pie-charts-container">
+      <div class="chart-wrapper">
+        <h3>Epic Allocation</h3>
+        <canvas id="epic-allocation-chart"></canvas>
+      </div>
+      <div class="chart-wrapper">
+        <h3>Another Epic</h3>
+        <canvas id="epic-allocation-chart"></canvas>
       </div>
     </div>
   </div>
-  <div class="chat-input">
-    <textarea rows="1" placeholder="Type your message..."></textarea>
-    <button>Send</button>
-  </div>
-</div>
-  
-<!-- Main Container -->
-<div class="container">
-  <div id="team-members-container" class="team-member-grid"></div>
 
-          <!-- Team - Time Log Section -->
-        <div class="section" id="time-log">
-            <h2>Team - Time Log</h2>
-            <canvas id="timeLogBarChart"></canvas>
-        </div>
+  <script>
 
-<!-- Charts -->
-  <div class="charts-container">
-  <div class="chart-wrapper">
-    <h3>Epic Allocation</h3>
-    <canvas id="epic-allocation-chart"></canvas>
-  </div>
-  <div class="chart-wrapper">
-    <h3>Another Epic</h3>
-    <canvas id="epic-allocation-chart"></canvas>
-  </div>
-</div>
-</div>
+    // Variables for JSON file paths
+    const responseJson = "response.json";
+    const epicJson = "epic_response.json";
 
-<script>
+    // Fetch data from response.json
+    function fetchDataAndInitialize() {
+      fetch(responseJson)
+        .then(response => response.json())
+        .then(data => {
+          return fetch(epicJson)
+            .then(epicResponse => epicResponse.json())
+            .then(epicData => {
+              const issues = data.issues || [];
+              const epicIssues = epicData.issues || [];
+              const teamData = {};
+              const epicAllocation = {};
+              const dailyTimeLogs = {};
 
-// Variables for JSON file paths
-const responseJson = "response.json";
-const epicJson = "epic_response.json";  
-  
-// Fetch data from response.json
-function fetchDataAndInitialize() {
-  fetch(responseJson)
-    .then(response => response.json())
-    .then(data => {
-      return fetch(epicJson)
-        .then(epicResponse => epicResponse.json())
-        .then(epicData => {
-          const issues = data.issues || [];
-          const epicIssues = epicData.issues || [];
-          const teamData = {};
-          const epicAllocation = {};
-           const dailyTimeLogs = {};
+              issues.forEach(issue => {
+                const assignee = issue.fields.assignee?.displayName || "Unassigned";
+                const worklogs = issue.fields.worklog?.worklogs || [];
+                const statusId = issue.fields.status?.id || "";
+                const sprintField = issue.fields.customfield_10104 || [];
+                const storyPoint = issue.fields.customfield_10102 || 0;
+                const epicKey = issue.fields.customfield_10106 || null;
 
-          issues.forEach(issue => {
-            const assignee = issue.fields.assignee?.displayName || "Unassigned";
-            const worklogs = issue.fields.worklog?.worklogs || [];
-            const statusId = issue.fields.status?.id || "";
-            const sprintField = issue.fields.customfield_10104 || [];
-            const storyPoint = issue.fields.customfield_10102 || 0;
-            const epicKey = issue.fields.customfield_10106 || null;
-
-            if (!teamData[assignee]) {
-              teamData[assignee] = {
-                name: assignee,
-                storyPoints: 0,
-                completedStoryPoints: 0,
-                timeSpent: 0,
-                blockedTickets: 0,
-                carryForwardTickets: 0,
-                prs: 0,
-                yetToStart: 0,
-                completed: 0,
-                epics: []
-              };
-            }
-          
-            const regex = /stateCount=(\d+)/;
-            const match = issue.fields.customfield_11201.match(regex);
-            const stateCount = match ? parseInt(match[1], 10) : 0;
-
-             worklogs.forEach(log => {
-              const date = new Date(log.created).toISOString().split('T')[0]; // Extract date
-              dailyTimeLogs[date] = (dailyTimeLogs[date] || 0) + log.timeSpentSeconds / 3600; // Convert seconds to hours
-            });
-
-            teamData[assignee].storyPoints += storyPoint;
-            teamData[assignee].timeSpent += worklogs.reduce((sum, log) => sum + log.timeSpentSeconds / 3600, 0);
-            if (statusId === "6") {
-              teamData[assignee].completed += 1;
-              teamData[assignee].completedStoryPoints += storyPoint;
-            }
-            if (statusId === "1") {
-              teamData[assignee].yetToStart += 1;
-            }
-            if (statusId === "10002") {
-              teamData[assignee].blockedTickets += 1;
-            }
-            if (sprintField.length > 1) {
-              teamData[assignee].carryForwardTickets += 1;
-            }
-            teamData[assignee].prs += stateCount;
-
-            if (epicKey) {
-              const matchingEpic = epicIssues.find(epic => epic.key === epicKey);
-              if (matchingEpic) {
-                const epicName = matchingEpic.fields.customfield_10105;
-                if (epicName && !teamData[assignee].epics.includes(epicName)) {
-                  teamData[assignee].epics.push(epicName);
+                if (!teamData[assignee]) {
+                  teamData[assignee] = {
+                    name: assignee,
+                    storyPoints: 0,
+                    completedStoryPoints: 0,
+                    timeSpent: 0,
+                    blockedTickets: 0,
+                    carryForwardTickets: 0,
+                    prs: 0,
+                    yetToStart: 0,
+                    completed: 0,
+                    epics: []
+                  };
                 }
-                // Update epic allocation
-                  if (!epicAllocation[epicName]) {
-                    epicAllocation[epicName] = 0;
+
+                const regex = /stateCount=(\d+)/;
+                const match = issue.fields.customfield_11201.match(regex);
+                const stateCount = match ? parseInt(match[1], 10) : 0;
+
+                worklogs.forEach(log => {
+                  const date = new Date(log.created).toISOString().split('T')[0]; // Extract date
+                  dailyTimeLogs[date] = (dailyTimeLogs[date] || 0) + log.timeSpentSeconds / 3600; // Convert seconds to hours
+                });
+
+                teamData[assignee].storyPoints += storyPoint;
+                teamData[assignee].timeSpent += worklogs.reduce((sum, log) => sum + log.timeSpentSeconds / 3600, 0);
+                if (statusId === "6") {
+                  teamData[assignee].completed += 1;
+                  teamData[assignee].completedStoryPoints += storyPoint;
+                }
+                if (statusId === "1") {
+                  teamData[assignee].yetToStart += 1;
+                }
+                if (statusId === "10002") {
+                  teamData[assignee].blockedTickets += 1;
+                }
+                if (sprintField.length > 1) {
+                  teamData[assignee].carryForwardTickets += 1;
+                }
+                teamData[assignee].prs += stateCount;
+
+                if (epicKey) {
+                  const matchingEpic = epicIssues.find(epic => epic.key === epicKey);
+                  if (matchingEpic) {
+                    const epicName = matchingEpic.fields.customfield_10105;
+                    if (epicName && !teamData[assignee].epics.includes(epicName)) {
+                      teamData[assignee].epics.push(epicName);
+                    }
+                    // Update epic allocation
+                    if (!epicAllocation[epicName]) {
+                      epicAllocation[epicName] = 0;
+                    }
+                    epicAllocation[epicName] += storyPoint;
                   }
-                  epicAllocation[epicName] += storyPoint;
+                }
+              });
+
+              const teamMembers = Object.values(teamData);
+              generateTeamMemberCards(teamMembers);
+              renderEpicChart(epicAllocation);
+
+              // Check if dailyTimeLogs has data before rendering
+              if (Object.keys(dailyTimeLogs).length > 0) {
+                renderBieGraph(dailyTimeLogs);
+              } else {
+                console.warn('No time log data available.');
               }
-            }
-          });
+            });
+        })
+        .catch(error => console.error("Error fetching data:", error));
+    }
 
-          const teamMembers = Object.values(teamData);
-          generateTeamMemberCards(teamMembers);
-          renderEpicChart(epicAllocation);
+    // Function to dynamically generate team member cards
+    function generateTeamMemberCards(data) {
+      const container = document.getElementById('team-members-container');
+      container.innerHTML = ''; // Clear any existing data
 
-          // Check if dailyTimeLogs has data before rendering
-          if (Object.keys(dailyTimeLogs).length > 0) {
-            renderBieGraph(dailyTimeLogs);
-          } else {
-            console.warn('No time log data available.');
-          }
-        });
-    })
-    .catch(error => console.error("Error fetching data:", error));
-}
-
-  // Function to dynamically generate team member cards
-  function generateTeamMemberCards(data) {
-    const container = document.getElementById('team-members-container');
-    container.innerHTML = ''; // Clear any existing data
-
-    data.forEach(member => {
-      const card = document.createElement('div');
-      card.className = 'team-card';
-      card.innerHTML = `
+      data.forEach(member => {
+        const card = document.createElement('div');
+        card.className = 'team-card';
+        card.innerHTML = `
         <h3>${member.name}</h3>
         <div class="main-kpi">Story Points: ${member.completedStoryPoints}/${member.storyPoints}</div>
         <p>Time Logged: ${member.timeSpent.toFixed(2)} hours</p>
@@ -390,73 +455,74 @@ function fetchDataAndInitialize() {
         <p>Epics: ${member.epics.length > 0 ? member.epics.join(", ") : "No Epics Assigned"}</p>
         <p>Most Time Spent on: MOBL-6112, MOBL-6119, MOBL-6120</p>
       `;
-      container.appendChild(card);
-    });
-  }
-
-function renderEpicChart(epicAllocation) {
-  // Convert epicAllocation object to labels and data arrays
-  const labels = Object.keys(epicAllocation);
-  const data = Object.values(epicAllocation);
-
-  // Update chart with the processed data
-  const epicAllocationCtx = document.getElementById('epic-allocation-chart').getContext('2d');
-  new Chart(epicAllocationCtx, {
-    type: 'pie',
-    data: {
-      labels: labels, // Use the labels array here
-      datasets: [{
-        data: data, // Use the data array here
-        backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
-      }]
-    },
-    options: {
-      layout: {
-      padding: 0 // Removes padding around the chart
-    },
-    maintainAspectRatio: true, // Maintains the default aspect ratio
-    aspectRatio: 1, // Ensures a square canvas for the pie chart
-    responsive: true // Ensures the chart resizes with its container
-  }
-  });
-}
-
-function renderBieGraph(dailyTimeLogs) {
-  // Convert dailyTimeLogs into arrays for chart.js
-  const sortedDates = Object.keys(dailyTimeLogs).sort((a, b) => new Date(a) - new Date(b)); // Sort dates from start to end
-  const timeLogs = sortedDates.map(date => dailyTimeLogs[date]);
-
-  const ctx = document.getElementById('timeLogBarChart').getContext('2d');
-  
-  // Render the chart using Chart.js
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: sortedDates, // Sorted dates
-      datasets: [{
-        label: 'Time Spent (hours)',
-        data: timeLogs,
-        backgroundColor: '#3f51b5',
-        borderColor: '#1e88e5',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
+        container.appendChild(card);
+      });
     }
-  });
-}
 
-  // Initialize the dashboard
-  document.addEventListener('DOMContentLoaded', () => {
-    fetchDataAndInitialize();
-  });
-</script>
+    function renderEpicChart(epicAllocation) {
+      // Convert epicAllocation object to labels and data arrays
+      const labels = Object.keys(epicAllocation);
+      const data = Object.values(epicAllocation);
+
+      // Update chart with the processed data
+      const epicAllocationCtx = document.getElementById('epic-allocation-chart').getContext('2d');
+      new Chart(epicAllocationCtx, {
+        type: 'pie',
+        data: {
+          labels: labels, // Use the labels array here
+          datasets: [{
+            data: data, // Use the data array here
+            backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
+          }]
+        },
+        options: {
+          layout: {
+            padding: 0 // Removes padding around the chart
+          },
+          maintainAspectRatio: true, // Maintains the default aspect ratio
+          aspectRatio: 1, // Ensures a square canvas for the pie chart
+          responsive: true // Ensures the chart resizes with its container
+        }
+      });
+    }
+
+    function renderBieGraph(dailyTimeLogs) {
+      // Convert dailyTimeLogs into arrays for chart.js
+      const sortedDates = Object.keys(dailyTimeLogs).sort((a, b) => new Date(a) - new Date(b)); // Sort dates from start to end
+      const timeLogs = sortedDates.map(date => dailyTimeLogs[date]);
+
+      const ctx = document.getElementById('timeLogBarChart').getContext('2d');
+
+      // Render the chart using Chart.js
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: sortedDates, // Sorted dates
+          datasets: [{
+            label: 'Time Spent (hours)',
+            data: timeLogs,
+            backgroundColor: '#3f51b5',
+            borderColor: '#1e88e5',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize the dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchDataAndInitialize();
+    });
+  </script>
 
 </body>
+
 </html>
