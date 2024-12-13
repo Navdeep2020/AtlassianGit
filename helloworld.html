@@ -295,7 +295,7 @@
 
         <div class="dropdown-container">
             <div class="dropdown">
-                <label for="team-selector">Select Team:</label>
+                <label for="team-selector">Select Project:</label>
                 <select id="team-selector">
                     <option value="team-a">Mobile</option>
                     <option value="team-b">Bill Wallet</option>
@@ -372,7 +372,7 @@
     <!-- Charts -->
     <div class="pie-charts-container">
       <div class="chart-wrapper">
-        <h3>Epic Allocation</h3>
+        <h3>Epic Storypoints Allocation</h3>
         <canvas id="epic-allocation-chart"></canvas>
       </div>
       <div class="chart-wrapper">
@@ -468,7 +468,12 @@
                     if (!epicAssigneeAllocation[epicName]) {
                       epicAssigneeAllocation[epicName] = new Set(); // Using Set to ensure unique assignees
                     }
-                    epicAssigneeAllocation[epicName].add(assignee)
+                    epicAssigneeAllocation[epicName].add(assignee);
+
+                       // Convert sets to arrays for rendering
+                      Object.keys(epicAssigneeAllocation).forEach(epicKey => {
+                        epicAssigneeAllocation[epicKey] = Array.from(epicAssigneeAllocation[epicKey]);
+                      });
                   }
                 }
               });
@@ -539,7 +544,7 @@
       });
 
       const assigneeLabels = Object.keys(epicAssigneeAllocation);
-      const assigneeData = assigneeLabels.map(epic => epicAssigneeAllocation[epic].size);
+      const assigneeData = assigneeLabels.map(assigneeLabels => epicAssigneeAllocation[assigneeLabels].length);
 
       const epicAssigneeCtx  = document.getElementById('epic-assignee-allocation-chart').getContext('2d');
       new Chart(epicAssigneeCtx, {
@@ -555,6 +560,17 @@
           layout: {
             padding: 0 // Removes padding around the chart
           },
+        plugins: {
+        tooltip: {
+          callbacks: {
+            // Customize tooltip to show assignee names
+            label: function(context) {
+              const epic = context.label;
+              const assignees = epicAssigneeAllocation[epic] || [];
+              return `Assignees: ${assignees.join(", ")}`;
+            }
+          }
+        },
           maintainAspectRatio: true, // Maintains the default aspect ratio
           aspectRatio: 1, // Ensures a square canvas for the pie chart
           responsive: true // Ensures the chart resizes with its container
