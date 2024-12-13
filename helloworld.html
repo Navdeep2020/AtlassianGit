@@ -265,18 +265,26 @@
         .dropdown:last-child {
             margin-right: 0;
         }
-        select {
+    
+        .select {
             width: 100%;
             padding: 10px;
             font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: #f9f9f9;
+            font-family: 'Arial', sans-serif; 
+            font-weight: 500; 
+            border: 1px solid #aaa; /* Slightly darker border for better visibility */
+            border-radius: 6px; /* Softer rounded corners */
+            background: #f3f3f3; 
+            color: #333; /* Darker text for contrast */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
+            transition: all 0.3s ease; 
         }
         .section-title {
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 10px;
+            color: #444;
+            font-family: 'Arial', sans-serif;
         }
     
   </style>
@@ -297,17 +305,16 @@
             <div class="dropdown">
                 <label for="team-selector">Select Team:</label>
                 <select id="team-selector">
-                    <option value="team-a">Team A</option>
-                    <option value="team-b">Team B</option>
-                    <option value="team-c">Team C</option>
+                    <option value="team-a">Mobile</option>
+                    <option value="team-b">Bill Wallet</option>
+                    <option value="team-c">Mobile Automation</option>
                 </select>
             </div>
             <div class="dropdown">
                 <label for="sprint-selector">Select Sprint:</label>
                 <select id="sprint-selector">
-                    <option value="sprint-1">Sprint 1</option>
-                    <option value="sprint-2">Sprint 2</option>
-                    <option value="sprint-3">Sprint 3</option>
+                    <option value="sprint-1">MOBL-26NOV</option>
+                    <option value="sprint-2">MOBL-10DEC</option>
                 </select>
             </div>  
         </div>
