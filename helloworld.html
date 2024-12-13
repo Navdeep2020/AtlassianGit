@@ -329,8 +329,8 @@
         <canvas id="epic-allocation-chart"></canvas>
       </div>
       <div class="chart-wrapper">
-        <h3>Another Epic</h3>
-        <canvas id="epic-allocation-chart"></canvas>
+        <h3>Epic Assignee Allocation</h3>
+        <canvas id="epic-assignee-allocation-chart"></canvas>
       </div>
     </div>
   </div>
@@ -353,6 +353,7 @@
               const epicIssues = epicData.issues || [];
               const teamData = {};
               const epicAllocation = {};
+              const epicAssigneeAllocation = {};
               const dailyTimeLogs = {};
 
               issues.forEach(issue => {
@@ -416,13 +417,18 @@
                       epicAllocation[epicName] = 0;
                     }
                     epicAllocation[epicName] += storyPoint;
+
+                    if (!epicAssigneeAllocation[epicName]) {
+                      epicAssigneeAllocation[epicName] = new Set(); // Using Set to ensure unique assignees
+                    }
+                    epicAssigneeAllocation[epicName].add(assignee)
                   }
                 }
               });
 
               const teamMembers = Object.values(teamData);
               generateTeamMemberCards(teamMembers);
-              renderEpicChart(epicAllocation);
+              renderEpicChart(epicAllocation, epicAssigneeAllocation);
 
               // Check if dailyTimeLogs has data before rendering
               if (Object.keys(dailyTimeLogs).length > 0) {
@@ -459,7 +465,7 @@
       });
     }
 
-    function renderEpicChart(epicAllocation) {
+    function renderEpicChart(epicAllocation, epicAssigneeAllocation) {
       // Convert epicAllocation object to labels and data arrays
       const labels = Object.keys(epicAllocation);
       const data = Object.values(epicAllocation);
@@ -472,6 +478,29 @@
           labels: labels, // Use the labels array here
           datasets: [{
             data: data, // Use the data array here
+            backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
+          }]
+        },
+        options: {
+          layout: {
+            padding: 0 // Removes padding around the chart
+          },
+          maintainAspectRatio: true, // Maintains the default aspect ratio
+          aspectRatio: 1, // Ensures a square canvas for the pie chart
+          responsive: true // Ensures the chart resizes with its container
+        }
+      });
+
+      const assigneeLabels = Object.keys(epicAssigneeAllocation);
+      const assigneeData = assigneeLabels.map(epic => epicAssigneeAllocation[epic].size);
+
+      const epicAssigneeCtx  = document.getElementById('epic-assignee-allocation-chart').getContext('2d');
+      new Chart(epicAssigneeCtx, {
+        type: 'pie',
+        data: {
+          labels: assigneeLabels, // Use the labels array here
+          datasets: [{
+            data: assigneeData, // Use the data array here
             backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
           }]
         },
