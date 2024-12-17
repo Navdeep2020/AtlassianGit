@@ -212,7 +212,7 @@
       display: flex;
       flex-direction: column;
       /* Stack heading and chart vertically */
-      gap: 1rem;
+      gap: 0rem;
       /* Space between <h3> and <canvas> */
       align-items: center;
       /* Center align heading and chart */
@@ -220,6 +220,14 @@
       border-radius: 8px;
       padding: 1rem;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-wrapper #chart-description {
+      color: grey;
+    }
+
+    .chart-wrapper h3 {
+      margin-bottom: 5px;
     }
 
     .chart-wrapper canvas {
@@ -253,32 +261,35 @@
     }
 
     /* Drop Downs */
-   .dropdown-container {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .dropdown {
-            flex: 1;
-            margin-right: 10px;
-        }
-        .dropdown:last-child {
-            margin-right: 0;
-        }
-        select {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: #f9f9f9;
-        }
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-    
+    .dropdown-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .dropdown {
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .dropdown:last-child {
+      margin-right: 0;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #f9f9f9;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 
@@ -293,24 +304,24 @@
   <!-- Main Container -->
   <div class="container">
 
-        <div class="dropdown-container">
-            <div class="dropdown">
-                <label for="team-selector">Select Project:</label>
-                <select id="team-selector">
-                    <option value="team-a">Mobile</option>
-                    <option value="team-b">Bill Wallet</option>
-                    <option value="team-c">Web</option>
-                </select>
-            </div>
-            <div class="dropdown">
-                <label for="sprint-selector">Select Sprint:</label>
-                <select id="sprint-selector">
-                    <option value="sprint-1">MOBL-26NOV</option>
-                    <option value="sprint-2">MOBL-10DEC</option>
-                </select>
-            </div>  
-        </div>
-          
+    <div class="dropdown-container">
+      <div class="dropdown">
+        <label for="team-selector">Select Project:</label>
+        <select id="team-selector">
+          <option value="team-a">Mobile</option>
+          <option value="team-b">Bill Wallet</option>
+          <option value="team-c">Web</option>
+        </select>
+      </div>
+      <div class="dropdown">
+        <label for="sprint-selector">Select Sprint:</label>
+        <select id="sprint-selector">
+          <option value="sprint-1">MOBL-26NOV</option>
+          <option value="sprint-2">MOBL-10DEC</option>
+        </select>
+      </div>
+    </div>
+
     <!-- Sprint Summary Chat -->
     <div class="chat-container">
       <div class="chat-header">
@@ -318,7 +329,7 @@
       </div>
       <div class="chat-content">
         <div class="message bot-message">
-          Ask me anything about this sprint, or choose an option below:
+          Ask me anything about this sprint, or choose the below options:
           <div class="chat-options">
             <a href="#" class="option-button" style="background: #005FA0;">Summarize by Epics</a>
             <a href="#" class="option-button">Summarize by Assignee</a>
@@ -327,23 +338,46 @@
           </div>
         </div>
         <div class="message user-message">
-          Summarize by Epics
+          Summarize by Categories (Release, Development, Bugfixes)
         </div>
         <div class="message bot-message">
           <pre>{
-    "Epics": [
-        {
-            "Epic": "iOS Mobile CP App",
-            "jira-issues": [
-                "MOBL-6070: Released CMKY, ANGA, and TGAZ brand apps on the App Store, verified by QA and made live by nrajput with screenshots provided.",
-                "MOBL-6062: Released five HRST brand apps, handled installation, login, and submission for Apple review by nrajput.",
-                "MOBL-6040: Rebased five HRST brands with SDK v3.2.0 by navsingh, tested by Ajsharma, confirming operational status.",
-                "MOBL-6039: Updated ANGA to SDK v3.2.0, tested successfully by navsingh.",
-                "MOBL-6038: Updated CMKY to SDK v3.2.0, confirmed functional by ajsharma.",
-                "MOBL-6037: Updated TGAZ to SDK v3.2.0, tested by navsingh and ajsharma despite some account testing issues."
-            ]
-        }
-    ]
+            {
+              "Release": {
+                  "jira_issues": [
+                      "MOBL-6105: Release of NAGD iOS and Android CP App covering sign-up, login, make payment, autopay, and add payment method functionalities. Testing completed and sign-off done.",
+                      "MOBL-6104: Release of GEUS iOS and Android CP App covering sign-up, login, make payment, and add payment method functionalities. Testing completed and sign-off done.",
+                      "MOBL-6096: Release 2.5.11 SDK version with bug fixes and improvements. Includes merging dev branch to master, creating tag, updating KB pages, and addressing specific issues such as card scanning UI fix and dialog dark mode style issues.",
+                      "MOBL-6095: Release CTSS build on the play store for a new AD app. Involves merging dev changes, testing the UAT app, and updating the play store.",
+                      "MOBL-6088: Rebase NAGD biller with master code and release to play store, with internal testing link provided.",
+                      "MOBL-6086: Rebase GEUS biller with master code and release to play store."
+                  ]
+              },
+              "Bugfixes": {
+                  "jira_issues": [
+                      "MOBL-6115: Resolved issue with Apple Pay not working on SIT by renewing the expired Apple Pay certificate. Tested and confirmed the fix.",
+                      "MOBL-6106: Addressed issue with Amazon Pay not working for FBEM biller on UAT due to 'Invalid Iframe Token' error.",
+                      "MOBL-6094: Provided biller support for various issues, including resolving GPay issue for CEMI biller and troubleshooting autopay issues for CICN biller.",
+                      "MOBL-6114: Fixed issues with T&C links and authorization terms being read back incorrectly by Talk Back in Android SDK. Also resolved issues with the back button and nickname screen headers.",
+                      "MOBL-6109: Updated T&C and privacy links in iOS SDK to point to a centralized location. Changes discussed with the team, implemented, and assigned to QA for testing.",
+                      "MOBL-6092: Updated Flutter POC dependency to work with the latest Android Studio, resolving conflicts and ensuring proper functionality."
+                  ]
+              },
+              "Development": {
+                  "jira_issues": [
+                      "MOBL-6111: Investigated and troubleshooted the swipe reader connection issue with EOCW AD app.",
+                      "MOBL-6101: Summarized content using LlamaIndex and Langchain for comparison of performance. Created POC with tree summarize, conducted team KT, and compared results.",
+                      "MOBL-6107: Updated T&C and Privacy policy in Android CP to point to a centralized location and added SMS policy and checkboxes where necessary.",
+                      "MOBL-6102: Updated T&C, privacy, and authorization links in Android CP to point to a centralized location.",
+                      "MOBL-6080: Added dark mode support in Jetpack Compose for Android SDK.",
+                      "MOBL-6077: Implemented detail screen design using Jetpack Compose for Android SDK.",
+                      "MOBL-6110: Updated UI for iOS CP app with changes to T&C, privacy policy, and SMS policy, including accessibility labels.",
+                      "MOBL-6100: Developed UI for JIRA app to populate sprint data and fetch development panel summary, working on APIs and integrating LangChain.",
+                      "MOBL-6099: Integrated new SDK v3.2.1 in iOS CP app and tested date picker issue.",
+                      "MOBL-6093: Developed Jira issue summary generation using Summary Chain in LangChain, exploring methods like Map-Reduce and Stuff, and working on structured output and error handling."
+                  ]
+              }
+          }
 }</pre>
         </div>
       </div>
@@ -355,8 +389,8 @@
 
     <!-- Team - Time Log Section -->
     <div class="section">
-      <h2>Team - Time Log</h2>
-      <p>Day wise time logged by whole team in this sprint.</p><br />
+      <h2>Team Time Log</h2>
+      <p>Day wise time logged by whole team in this sprint. Find your team's most productive and non-productive days.</p><br />
       <div class="team-timelog-container">
         <canvas id="timeLogBarChart"></canvas>
       </div>
@@ -373,11 +407,20 @@
     <div class="pie-charts-container">
       <div class="chart-wrapper">
         <h3>Epic Storypoints Allocation</h3>
+        <p id="chart-description">Check which epic consumed most story points</p>
         <canvas id="epic-allocation-chart"></canvas>
       </div>
+
+      <div class="chart-wrapper">
+        <h3>Epic Assignee Involved</h3>
+        <p id="chart-description">Check which epic consumed most assignees</p>
+        <canvas id="epic-assignee-allocation-chart"></canvas>
+      </div>
+
       <div class="chart-wrapper">
         <h3>Epic Assignee Allocation</h3>
-        <canvas id="epic-assignee-allocation-chart"></canvas>
+        <p id="chart-description">Check epic wise % allocaton of each assignee</p>
+        <canvas id="epic-allocation-percentage-chart"></canvas>
       </div>
     </div>
   </div>
@@ -385,7 +428,7 @@
   <script>
 
     // Variables for JSON file paths
-    const responseJson = "response2.json";
+    const responseJson = "response.json";
     const epicJson = "epic_response.json";
 
     // Fetch data from response.json
@@ -399,8 +442,9 @@
               const issues = data.issues || [];
               const epicIssues = epicData.issues || [];
               const teamData = {};
-              const epicAllocation = {};
-              const epicAssigneeAllocation = {};
+              const epicStoryPointAllocation = {}; /*{"epic name": Total story points in this epic}*/
+              const epicAssigneeInvolved = {}; /*{"epic name": Set of Unique Assignees}*/
+              const assigneePercentageAllocation ={}; /*Assignee and its percentage in each epic*/
               const dailyTimeLogs = {};
 
               issues.forEach(issue => {
@@ -430,19 +474,13 @@
                 const match = issue.fields.customfield_11201.match(regex);
                 const stateCount = match ? parseInt(match[1], 10) : 0;
 
-                const activeSprint = issue.fields.customfield_10104.find(sprint => sprint.includes("state=ACTIVE"));
-                const startDateMatch = activeSprint.match(/startDate=([\d\-T:.]+)\.000/);
-                const sprintStartDate = startDateMatch ? new Date(startDateMatch[1]) : null;
-
-                // Filter worklogs by active sprint start date
-                const filteredWorklogs = worklogs.filter(log => {
-                    const logDate = new Date(log.created);
-                    return sprintStartDate && logDate >= sprintStartDate;
-                });
-
-                filteredWorklogs.forEach(log => {
+                worklogs.forEach(log => {
                   const date = new Date(log.created).toISOString().split('T')[0]; // Extract date
-                  dailyTimeLogs[date] = (dailyTimeLogs[date] || 0) + log.timeSpentSeconds / 3600; // Convert seconds to hours
+                  const timeSpentHours = log.timeSpentSeconds / 3600; // Convert seconds to hours
+                  if (!dailyTimeLogs[date]) {
+                    dailyTimeLogs[date] = {};
+                  }
+                  dailyTimeLogs[date][assignee] = (dailyTimeLogs[date][assignee] || 0) + timeSpentHours;
                 });
 
                 teamData[assignee].storyPoints += storyPoint;
@@ -469,23 +507,41 @@
                     if (epicName && !teamData[assignee].epics.includes(epicName)) {
                       teamData[assignee].epics.push(epicName);
                     }
-                    // Update epic allocation
-                    if (!epicAllocation[epicName]) {
-                      epicAllocation[epicName] = 0;
+                    // Update epic StoryPoint allocation
+                    if (!epicStoryPointAllocation[epicName]) {
+                      epicStoryPointAllocation[epicName] = 0;
                     }
-                    epicAllocation[epicName] += storyPoint;
+                    epicStoryPointAllocation[epicName] += storyPoint;
 
-                    if (!epicAssigneeAllocation[epicName]) {
-                      epicAssigneeAllocation[epicName] = new Set(); // Using Set to ensure unique assignees
+                    // Update epic assignee involved
+                    if (!epicAssigneeInvolved[epicName]) {
+                      epicAssigneeInvolved[epicName] = new Set(); // Using Set to ensure unique assignees
                     }
-                    epicAssigneeAllocation[epicName].add(assignee)
+                    epicAssigneeInvolved[epicName].add(assignee)
+
+                    // Update epic assignee allocation
+                    if(!assigneePercentageAllocation[assignee]) {
+                      assigneePercentageAllocation[assignee] = {};
+                    }
+
+                    //Epic name does not exist. Make a new entry
+                    if(!assigneePercentageAllocation[assignee][epicName]) {
+                      assigneePercentageAllocation[assignee][epicName] = storyPoint 
+
+                    } else {
+                      //Epic name already exists, just add the story points
+                      assigneePercentageAllocation[assignee][epicName] += storyPoint;
+                    }
                   }
                 }
               });
 
+              console.log(assigneePercentageAllocation);
+              console.log(epicStoryPointAllocation);
+
               const teamMembers = Object.values(teamData);
               generateTeamMemberCards(teamMembers);
-              renderEpicChart(epicAllocation, epicAssigneeAllocation);
+              renderEpicCharts(epicStoryPointAllocation, epicAssigneeInvolved, assigneePercentageAllocation);
 
               // Check if dailyTimeLogs has data before rendering
               if (Object.keys(dailyTimeLogs).length > 0) {
@@ -511,7 +567,7 @@
         <div class="main-kpi">Story Points: ${member.completedStoryPoints}/${member.storyPoints}</div>
         <p>Time Logged: ${member.timeSpent.toFixed(2)} hours</p>
         <p>Blocked Tickets: ${member.blockedTickets}</p>
-        <p>Tickets From Previous Sprint: ${member.carryForwardTickets}</p>
+        <p>Carry Forward Tickets: ${member.carryForwardTickets}</p>
         <p>PRs: ${member.prs}</p>
         <p>Yet to Start: ${member.yetToStart}</p>
         <p>Completed: ${member.completed}</p>
@@ -522,10 +578,13 @@
       });
     }
 
-    function renderEpicChart(epicAllocation, epicAssigneeAllocation) {
+    function renderEpicCharts(epicStoryPointAllocation, epicAssigneeInvolved, assigneePercentageAllocation) {
       // Convert epicAllocation object to labels and data arrays
-      const labels = Object.keys(epicAllocation);
-      const data = Object.values(epicAllocation);
+      const labels = Object.keys(epicStoryPointAllocation);
+      const data = Object.values(epicStoryPointAllocation);
+
+      // Calculate total story points
+      const totalStoryPoints = data.reduce((sum, value) => sum + value, 0);
 
       // Update chart with the processed data
       const epicAllocationCtx = document.getElementById('epic-allocation-chart').getContext('2d');
@@ -544,77 +603,195 @@
           },
           maintainAspectRatio: true, // Maintains the default aspect ratio
           aspectRatio: 1, // Ensures a square canvas for the pie chart
-          responsive: true // Ensures the chart resizes with its container
-        }
-      });
-
-      const assigneeLabels = Object.keys(epicAssigneeAllocation);
-      const assigneeData = assigneeLabels.map(epic => epicAssigneeAllocation[epic].size);
-
-        // Create a mapping for tooltip display
-      const tooltipData = assigneeLabels.map(epic => {
-        const assignees = Array.from(epicAssigneeAllocation[epic]); // Convert Set to Array
-        return assignees.join(', '); // Join assignee names with commas
-      });
-
-    const epicAssigneeCtx = document.getElementById('epic-assignee-allocation-chart').getContext('2d');
-    new Chart(epicAssigneeCtx, {
-      type: 'pie',
-      data: {
-        labels: assigneeLabels, // Use the labels array here
-        datasets: [{
-          data: assigneeData, // Use the data array here
-          backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
-        }]
-      },
-      options: {
-        layout: {
-          padding: 0 // Removes padding around the chart
-        },
-        maintainAspectRatio: true, // Maintains the default aspect ratio
-        aspectRatio: 1, // Ensures a square canvas for the pie chart
-        responsive: true, // Ensures the chart resizes with its container
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(tooltipItem) {
-                // Fetch assignee names for the hovered slice
-                const epic = assigneeLabels[tooltipItem.dataIndex];
-                const assignees = tooltipData[tooltipItem.dataIndex];
-                return `${epic}: ${assignees}`;
+          responsive: true, // Ensures the chart resizes with its container
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const value = context.raw; // Raw data value for the slice
+                  const percentage = ((value / totalStoryPoints) * 100).toFixed(2); // Calculate percentage
+                  return `${context.label}: ${value} points (${percentage}%)`;
+                }
               }
             }
           }
         }
-      }
-    });
- }
+      });
 
-    function renderBieGraph(dailyTimeLogs) {
-      // Convert dailyTimeLogs into arrays for chart.js
-      const sortedDates = Object.keys(dailyTimeLogs).sort((a, b) => new Date(a) - new Date(b)); // Sort dates from start to end
-      const timeLogs = sortedDates.map(date => dailyTimeLogs[date]);
+      const assigneeLabels = Object.keys(epicAssigneeInvolved);
+      const assigneeData = assigneeLabels.map(epic => epicAssigneeInvolved[epic].size);
 
-      const ctx = document.getElementById('timeLogBarChart').getContext('2d');
+      // Create a mapping for tooltip display
+      const tooltipData = assigneeLabels.map(epic => {
+        const assignees = Array.from(epicAssigneeInvolved[epic]); // Convert Set to Array
+        return assignees.join(', '); // Join assignee names with commas
+      });
 
-      // Render the chart using Chart.js
-      new Chart(ctx, {
-        type: 'bar',
+      const epicAssigneeCtx = document.getElementById('epic-assignee-allocation-chart').getContext('2d');
+      new Chart(epicAssigneeCtx, {
+        type: 'pie',
         data: {
-          labels: sortedDates, // Sorted dates
+          labels: assigneeLabels, // Use the labels array here
           datasets: [{
-            label: 'Time Spent (hours)',
-            data: timeLogs,
-            backgroundColor: '#3f51b5',
-            borderColor: '#1e88e5',
-            borderWidth: 1
+            data: assigneeData, // Use the data array here
+            backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50'],
           }]
         },
         options: {
+          layout: {
+            padding: 0 // Removes padding around the chart
+          },
+          maintainAspectRatio: true, // Maintains the default aspect ratio
+          aspectRatio: 1, // Ensures a square canvas for the pie chart
+          responsive: true, // Ensures the chart resizes with its container
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function (tooltipItem) {
+                  // Fetch assignee names for the hovered slice
+                  const epic = assigneeLabels[tooltipItem.dataIndex];
+                  const assignees = tooltipData[tooltipItem.dataIndex];
+                  return `${epic}: ${assignees}`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      renderEpicAllocationPercentageChart(assigneePercentageAllocation);
+    }
+
+    function renderEpicAllocationPercentageChart(assigneeData) {
+      //   // Assuming you have predefined colors for each epic
+      // const epicColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A5']; // Example colors
+
+      // Generate labels (assignee names) and data for the chart
+      const assigneeNames = Object.keys(assigneeData);
+      const epicNames = [...new Set(Object.values(assigneeData).flatMap(epicObj => Object.keys(epicObj)))]; // Unique epic names
+      const dataset = [];
+
+      // console.log(epicNames)
+      // console.log(assigneeNames)
+
+      assigneeNames.forEach(assignee => {
+        // Calculate the total story points for the current assignee
+        const totalStoryPoints = Object.values(assigneeData[assignee]).reduce((sum, points) => sum + points, 0);
+
+        // Create the dataset for the current assignee
+        const assigneeAllocation = epicNames.map(epic => {
+          const epicPoints = assigneeData[assignee][epic] || 0;
+          return (epicPoints / totalStoryPoints) * 100; // Percentage allocation for each epic
+        });
+
+        console.log(assigneeAllocation);
+
+        // Add the data for the current assignee
+        dataset.push({
+          label: assignee,
+          data: assigneeAllocation,
+          // backgroundColor: epicColors.slice(0, epicNames.length) // Use colors for each epic
+        });
+      });
+
+      // Chart configuration for a horizontal stacked bar chart
+      const config = {
+        type: 'bar',
+        data: {
+          labels: epicNames, // Epics will be on the x-axis
+          datasets: dataset // Each dataset corresponds to one assignee with their epic allocations
+        },
+        options: {
           responsive: true,
+          indexAxis: 'y', // Makes the chart horizontal (switches axes)
+          maintainAspectRatio: true, // Maintains the default aspect ratio
+          aspectRatio: 1, // Ensures a square canvas for the pie chart
+          responsive: true, 
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function (tooltipItem) {
+                  const assignee = tooltipItem.dataset.label;
+                  const epic = epicNames[tooltipItem.dataIndex];
+                  const percentage = tooltipItem.raw.toFixed(2);
+                  return `${assignee}: ${epic} - ${percentage}%`;
+                }
+              }
+            }
+          },
           scales: {
+            x: {
+              stacked: true, // Stack the bars horizontally
+              ticks: {
+                beginAtZero: true,
+                max: 100 // Max value for percentage
+              }
+            },
             y: {
-              beginAtZero: true
+              stacked: false, // Stack the bars vertically (for each assignee)
+            }
+          }
+        }
+      };
+
+      const ctx = document.getElementById('epic-allocation-percentage-chart').getContext('2d');
+      new Chart(ctx, config);
+    }
+
+    function renderBieGraph(dailyTimeLogs) {
+      // Extract all unique assignees from dailyTimeLogs
+      const uniqueAssignees = new Set();
+      for (const date in dailyTimeLogs) {
+        Object.keys(dailyTimeLogs[date]).forEach(assignee => uniqueAssignees.add(assignee));
+      }
+      const assignees = Array.from(uniqueAssignees);
+
+      // Prepare datasets for Chart.js
+      const sortedDates = Object.keys(dailyTimeLogs).sort((a, b) => new Date(a) - new Date(b)); // Sort dates
+      const datasets = assignees.map((assignee, index) => {
+        const color = `hsl(${index * 40}, 70%, 60%)`; // Generate a unique color for each assignee
+        return {
+          label: assignee,
+          data: sortedDates.map(date => dailyTimeLogs[date][assignee] || 0), // Use 0 if no time log for this assignee on a given day
+          backgroundColor: color
+        };
+      });
+
+      // Render the chart
+      const ctx = document.getElementById('timeLogBarChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: sortedDates,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const assignee = context.dataset.label;
+                  const hours = context.raw;
+                  return `${assignee}: ${hours.toFixed(2)} hours`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              stacked: true
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Time Spent (hours)'
+              }
             }
           }
         }
