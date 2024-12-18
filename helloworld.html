@@ -587,6 +587,10 @@
       const labels = Object.keys(epicStoryPointAllocation);
       const data = Object.values(epicStoryPointAllocation);
 
+      if (!epicStoryPointAllocation["Unassigned EPIC"]) {
+        epicStoryPointAllocation["Unassigned EPIC"] = 0;
+      }
+
       // Calculate total story points
       const totalStoryPoints = data.reduce((sum, value) => sum + value, 0);
 
@@ -624,6 +628,10 @@
 
       const assigneeLabels = Object.keys(epicAssigneeInvolved);
       const assigneeData = assigneeLabels.map(epic => epicAssigneeInvolved[epic].size);
+
+        if (!epicAssigneeInvolved["Unassigned EPIC"]) {
+          epicAssigneeInvolved["Unassigned EPIC"] = new Set();
+        }
 
       // Create a mapping for tooltip display
       const tooltipData = assigneeLabels.map(epic => {
