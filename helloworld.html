@@ -499,16 +499,15 @@
                   teamData[assignee].carryForwardTickets += 1;
                 }
                 teamData[assignee].prs += stateCount;
+                
+                let epicName = "Unassigned EPIC"
+                if (epicKey) {
+                  const matchingEpic = epicIssues.find(epic => epic.key === epicKey);
+                  
+                  if (matchingEpic) {
+                    epicName = matchingEpic.fields.customfield_10105 || "Unassigned EPIC";
 
-                // Handle EPIC assignment or "Unassigned EPIC" case
-                const epicName = epicKey
-                  ? epicIssues.find(epic => epic.key === epicKey)?.fields.customfield_10105 || "Unassigned EPIC"
-                  : "Unassigned EPIC";
-
-                // if (epicKey) {
-                //   const matchingEpic = epicIssues.find(epic => epic.key === epicKey);
-                //   if (matchingEpic) {
-                    const epicName = matchingEpic.fields.customfield_10105;
+                    // Add epic to assignee's epics list if not already included
                     if (epicName && !teamData[assignee].epics.includes(epicName)) {
                       teamData[assignee].epics.push(epicName);
                     }
@@ -537,8 +536,8 @@
                       //Epic name already exists, just add the story points
                       assigneePercentageAllocation[assignee][epicName] += storyPoint;
                     }
-                //   }
-                // }
+                  }
+                }
               });
 
               console.log(assigneePercentageAllocation);
@@ -585,8 +584,7 @@
 
     function renderEpicCharts(epicStoryPointAllocation, epicAssigneeInvolved, assigneePercentageAllocation) {
       // Convert epicAllocation object to labels and data arrays
-      // const labels = Object.keys(epicStoryPointAllocation);
-      const labels = Object.keys(epicStoryPointAllocation).map(epic => epic || "Unassigned EPIC");
+      const labels = Object.keys(epicStoryPointAllocation);
       const data = Object.values(epicStoryPointAllocation);
 
       // Calculate total story points
@@ -624,8 +622,7 @@
         }
       });
 
-     // const assigneeLabels = Object.keys(epicAssigneeInvolved);
-      const assigneeLabels = Object.keys(epicAssigneeInvolved).map(epic => epic || "Unassigned EPIC");
+      const assigneeLabels = Object.keys(epicAssigneeInvolved);
       const assigneeData = assigneeLabels.map(epic => epicAssigneeInvolved[epic].size);
 
       // Create a mapping for tooltip display
