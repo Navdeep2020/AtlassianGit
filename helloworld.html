@@ -587,20 +587,23 @@ function fetchDataAndInitialize() {
       // Convert epicAllocation object to labels and data arrays
       const labels = Object.keys(epicStoryPointAllocation);
       const data = Object.values(epicStoryPointAllocation);
-      
+
+      // if (!epicStoryPointAllocation["Unassigned EPIC"]) {
+      //   epicStoryPointAllocation["Unassigned EPIC"] = 0;
+      // }
+
       // Calculate total story points
       const totalStoryPoints = data.reduce((sum, value) => sum + value, 0);
 
       // Update chart with the processed data
       const epicAllocationCtx = document.getElementById('epic-allocation-chart').getContext('2d');
-      const piecolor = `hsl(${index * 40 % 360}, 70%, 60%)`;
       new Chart(epicAllocationCtx, {
         type: 'pie',
         data: {
           labels: labels, // Use the labels array here
           datasets: [{
             data: data, // Use the data array here
-            backgroundColor: piecolor,
+            backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50', '#117864'],
           }]
         },
         options: {
@@ -627,6 +630,10 @@ function fetchDataAndInitialize() {
       const assigneeLabels = Object.keys(epicAssigneeInvolved);
       const assigneeData = assigneeLabels.map(epic => epicAssigneeInvolved[epic].size);
 
+        // if (!epicAssigneeInvolved["Unassigned EPIC"]) {
+        //   epicAssigneeInvolved["Unassigned EPIC"] = new Set();
+        // }
+
       // Create a mapping for tooltip display
       const tooltipData = assigneeLabels.map(epic => {
         const assignees = Array.from(epicAssigneeInvolved[epic]); // Convert Set to Array
@@ -634,14 +641,13 @@ function fetchDataAndInitialize() {
       });
 
       const epicAssigneeCtx = document.getElementById('epic-assignee-allocation-chart').getContext('2d');
-      const piecolor = `hsl(${index * 40 % 360}, 70%, 60%)`;
       new Chart(epicAssigneeCtx, {
         type: 'pie',
         data: {
           labels: assigneeLabels, // Use the labels array here
           datasets: [{
             data: assigneeData, // Use the data array here
-            backgroundColor: piecolor,
+            backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50', '#117864'],
           }]
         },
         options: {
