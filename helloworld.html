@@ -428,13 +428,14 @@
   <script>
 
     // Variables for JSON file paths
+    const responseJsonOld = "response.json";
     const responseJson = "response2.json";
     const epicJson = "epic_response.json";
 
     // Fetch data from response.json
     // Fetch data from response.json
 function fetchDataAndInitialize() {
-  fetch(responseJson)
+  fetch(responseJsonOld)
     .then(response => response.json())
     .then(data => {
       return fetch(epicJson)
