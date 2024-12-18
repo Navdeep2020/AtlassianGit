@@ -481,7 +481,7 @@ function fetchDataAndInitialize() {
 
             // Filter worklogs by active sprint start date
             const filteredWorklogs = worklogs.filter(log => {
-               const logDate = new Date(log.created);
+               const logDate = new Date(log.started);
                return sprintStartDate && logDate >= sprintStartDate;
             });
             
