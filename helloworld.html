@@ -432,131 +432,132 @@
     const epicJson = "epic_response.json";
 
     // Fetch data from response.json
-    function fetchDataAndInitialize() {
-      fetch(responseJson)
-        .then(response => response.json())
-        .then(data => {
-          return fetch(epicJson)
-            .then(epicResponse => epicResponse.json())
-            .then(epicData => {
-              const issues = data.issues || [];
-              const epicIssues = epicData.issues || [];
-              const teamData = {};
-              const epicStoryPointAllocation = {}; /*{"epic name": Total story points in this epic}*/
-              const epicAssigneeInvolved = {}; /*{"epic name": Set of Unique Assignees}*/
-              const assigneePercentageAllocation ={}; /*Assignee and its percentage in each epic*/
-              const dailyTimeLogs = {};
+    // Fetch data from response.json
+function fetchDataAndInitialize() {
+  fetch(responseJson)
+    .then(response => response.json())
+    .then(data => {
+      return fetch(epicJson)
+        .then(epicResponse => epicResponse.json())
+        .then(epicData => {
+          const issues = data.issues || [];
+          const epicIssues = epicData.issues || [];
+          const teamData = {};
+          const epicStoryPointAllocation = {}; /*{"epic name": Total story points in this epic}*/
+          const epicAssigneeInvolved = {}; /*{"epic name": Set of Unique Assignees}*/
+          const assigneePercentageAllocation = {}; /*Assignee and its percentage in each epic*/
+          const dailyTimeLogs = {};
 
-              issues.forEach(issue => {
-                const assignee = issue.fields.assignee?.displayName || "Unassigned";
-                const worklogs = issue.fields.worklog?.worklogs || [];
-                const statusId = issue.fields.status?.id || "";
-                const sprintField = issue.fields.customfield_10104 || [];
-                const storyPoint = issue.fields.customfield_10102 || 0;
-                const epicKey = issue.fields.customfield_10106 || null;
+          issues.forEach(issue => {
+            const assignee = issue.fields.assignee?.displayName || "Unassigned";
+            const worklogs = issue.fields.worklog?.worklogs || [];
+            const statusId = issue.fields.status?.id || "";
+            const sprintField = issue.fields.customfield_10104 || [];
+            const storyPoint = issue.fields.customfield_10102 || 0;
+            const epicKey = issue.fields.customfield_10106 || null; // We check this for "Unassigned EPIC"
 
-                if (!teamData[assignee]) {
-                  teamData[assignee] = {
-                    name: assignee,
-                    storyPoints: 0,
-                    completedStoryPoints: 0,
-                    timeSpent: 0,
-                    blockedTickets: 0,
-                    carryForwardTickets: 0,
-                    prs: 0,
-                    yetToStart: 0,
-                    completed: 0,
-                    epics: []
-                  };
-                }
+            if (!teamData[assignee]) {
+              teamData[assignee] = {
+                name: assignee,
+                storyPoints: 0,
+                completedStoryPoints: 0,
+                timeSpent: 0,
+                blockedTickets: 0,
+                carryForwardTickets: 0,
+                prs: 0,
+                yetToStart: 0,
+                completed: 0,
+                epics: []
+              };
+            }
 
-                const regex = /stateCount=(\d+)/;
-                const match = issue.fields.customfield_11201.match(regex);
-                const stateCount = match ? parseInt(match[1], 10) : 0;
+            const regex = /stateCount=(\d+)/;
+            const match = issue.fields.customfield_11201.match(regex);
+            const stateCount = match ? parseInt(match[1], 10) : 0;
 
-                worklogs.forEach(log => {
-                  const date = new Date(log.created).toISOString().split('T')[0]; // Extract date
-                  const timeSpentHours = log.timeSpentSeconds / 3600; // Convert seconds to hours
-                  if (!dailyTimeLogs[date]) {
-                    dailyTimeLogs[date] = {};
-                  }
-                  dailyTimeLogs[date][assignee] = (dailyTimeLogs[date][assignee] || 0) + timeSpentHours;
-                });
-
-                teamData[assignee].storyPoints += storyPoint;
-                teamData[assignee].timeSpent += worklogs.reduce((sum, log) => sum + log.timeSpentSeconds / 3600, 0);
-                if (statusId === "6") {
-                  teamData[assignee].completed += 1;
-                  teamData[assignee].completedStoryPoints += storyPoint;
-                }
-                if (statusId === "1") {
-                  teamData[assignee].yetToStart += 1;
-                }
-                if (statusId === "10002") {
-                  teamData[assignee].blockedTickets += 1;
-                }
-                if (sprintField.length > 1) {
-                  teamData[assignee].carryForwardTickets += 1;
-                }
-                teamData[assignee].prs += stateCount;
-                
-                let epicName = "Unassigned EPIC"
-                if (epicKey) {
-                  const matchingEpic = epicIssues.find(epic => epic.key === epicKey);
-                  
-                  if (matchingEpic) {
-                    epicName = matchingEpic.fields.customfield_10105 || "Unassigned EPIC";
-
-                    // Add epic to assignee's epics list if not already included
-                    if (epicName && !teamData[assignee].epics.includes(epicName)) {
-                      teamData[assignee].epics.push(epicName);
-                    }
-                    // Update epic StoryPoint allocation
-                    if (!epicStoryPointAllocation[epicName]) {
-                      epicStoryPointAllocation[epicName] = 0;
-                    }
-                    epicStoryPointAllocation[epicName] += storyPoint;
-
-                    // Update epic assignee involved
-                    if (!epicAssigneeInvolved[epicName]) {
-                      epicAssigneeInvolved[epicName] = new Set(); // Using Set to ensure unique assignees
-                    }
-                    epicAssigneeInvolved[epicName].add(assignee)
-
-                    // Update epic assignee allocation
-                    if(!assigneePercentageAllocation[assignee]) {
-                      assigneePercentageAllocation[assignee] = {};
-                    }
-
-                    //Epic name does not exist. Make a new entry
-                    if(!assigneePercentageAllocation[assignee][epicName]) {
-                      assigneePercentageAllocation[assignee][epicName] = storyPoint 
-
-                    } else {
-                      //Epic name already exists, just add the story points
-                      assigneePercentageAllocation[assignee][epicName] += storyPoint;
-                    }
-                  }
-                }
-              });
-
-              console.log(assigneePercentageAllocation);
-              console.log(epicStoryPointAllocation);
-
-              const teamMembers = Object.values(teamData);
-              generateTeamMemberCards(teamMembers);
-              renderEpicCharts(epicStoryPointAllocation, epicAssigneeInvolved, assigneePercentageAllocation);
-
-              // Check if dailyTimeLogs has data before rendering
-              if (Object.keys(dailyTimeLogs).length > 0) {
-                renderBieGraph(dailyTimeLogs);
-              } else {
-                console.warn('No time log data available.');
+            worklogs.forEach(log => {
+              const date = new Date(log.created).toISOString().split('T')[0]; // Extract date
+              const timeSpentHours = log.timeSpentSeconds / 3600; // Convert seconds to hours
+              if (!dailyTimeLogs[date]) {
+                dailyTimeLogs[date] = {};
               }
+              dailyTimeLogs[date][assignee] = (dailyTimeLogs[date][assignee] || 0) + timeSpentHours;
             });
-        })
-        .catch(error => console.error("Error fetching data:", error));
-    }
+
+            teamData[assignee].storyPoints += storyPoint;
+            teamData[assignee].timeSpent += worklogs.reduce((sum, log) => sum + log.timeSpentSeconds / 3600, 0);
+            if (statusId === "6") {
+              teamData[assignee].completed += 1;
+              teamData[assignee].completedStoryPoints += storyPoint;
+            }
+            if (statusId === "1") {
+              teamData[assignee].yetToStart += 1;
+            }
+            if (statusId === "10002") {
+              teamData[assignee].blockedTickets += 1;
+            }
+            if (sprintField.length > 1) {
+              teamData[assignee].carryForwardTickets += 1;
+            }
+            teamData[assignee].prs += stateCount;
+
+            // Check if customfield_10106 is null, and if so, assign "Unassigned EPIC"
+            let epicName = "Unassigned EPIC";
+            if (epicKey) {
+              const matchingEpic = epicIssues.find(epic => epic.key === epicKey);
+              
+              if (matchingEpic) {
+                epicName = matchingEpic.fields.customfield_10105 || "Unassigned EPIC"; // Fetch epic name if exists
+              }
+            }
+
+            // Add epic to assignee's epics list if not already included
+            if (epicName && !teamData[assignee].epics.includes(epicName)) {
+              teamData[assignee].epics.push(epicName);
+            }
+
+            // Update epic StoryPoint allocation
+            if (!epicStoryPointAllocation[epicName]) {
+              epicStoryPointAllocation[epicName] = 0;
+            }
+            epicStoryPointAllocation[epicName] += storyPoint;
+
+            // Update epic assignee involved
+            if (!epicAssigneeInvolved[epicName]) {
+              epicAssigneeInvolved[epicName] = new Set(); // Using Set to ensure unique assignees
+            }
+            epicAssigneeInvolved[epicName].add(assignee);
+
+            // Update epic assignee allocation
+            if (!assigneePercentageAllocation[assignee]) {
+              assigneePercentageAllocation[assignee] = {};
+            }
+
+            if (!assigneePercentageAllocation[assignee][epicName]) {
+              assigneePercentageAllocation[assignee][epicName] = storyPoint;
+            } else {
+              assigneePercentageAllocation[assignee][epicName] += storyPoint;
+            }
+          });
+
+          console.log(assigneePercentageAllocation);
+          console.log(epicStoryPointAllocation);
+
+          const teamMembers = Object.values(teamData);
+          generateTeamMemberCards(teamMembers);
+          renderEpicCharts(epicStoryPointAllocation, epicAssigneeInvolved, assigneePercentageAllocation);
+
+          // Check if dailyTimeLogs has data before rendering
+          if (Object.keys(dailyTimeLogs).length > 0) {
+            renderBieGraph(dailyTimeLogs);
+          } else {
+            console.warn('No time log data available.');
+          }
+        });
+    })
+    .catch(error => console.error("Error fetching data:", error));
+}
+
 
     // Function to dynamically generate team member cards
     function generateTeamMemberCards(data) {
