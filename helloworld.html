@@ -486,12 +486,22 @@ function fetchDataAndInitialize() {
             });
             
             filteredWorklogs.forEach(log => {
-              const date = new Date(log.started).toISOString().split('T')[0]; // Extract date
+              const assigneeName = log.author.displayName || "Unassigned"; // Get the assignee for the specific log
+              const date = new Date(log.started).toISOString().split('T')[0]; // Extract the date
               const timeSpentHours = log.timeSpentSeconds / 3600; // Convert seconds to hours
+            
+              // Initialize dailyTimeLogs for the specific date if not present
               if (!dailyTimeLogs[date]) {
                 dailyTimeLogs[date] = {};
               }
-              dailyTimeLogs[date][assignee] = (dailyTimeLogs[date][assignee] || 0) + timeSpentHours;
+            
+              // Initialize dailyTimeLogs for the specific assignee if not present
+              if (!dailyTimeLogs[date][assigneeName]) {
+                dailyTimeLogs[date][assigneeName] = 0;
+              }
+            
+              // Add time spent to the specific assignee's log for the given date
+              dailyTimeLogs[date][assigneeName] += timeSpentHours;
             });
 
             teamData[assignee].storyPoints += storyPoint;
