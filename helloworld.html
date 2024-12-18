@@ -486,7 +486,7 @@ function fetchDataAndInitialize() {
             });
             
             filteredWorklogs.forEach(log => {
-              const date = new Date(log.created).toISOString().split('T')[0]; // Extract date
+              const date = new Date(log.started).toISOString().split('T')[0]; // Extract date
               const timeSpentHours = log.timeSpentSeconds / 3600; // Convert seconds to hours
               if (!dailyTimeLogs[date]) {
                 dailyTimeLogs[date] = {};
