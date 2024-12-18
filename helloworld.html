@@ -475,7 +475,17 @@ function fetchDataAndInitialize() {
             const match = issue.fields.customfield_11201.match(regex);
             const stateCount = match ? parseInt(match[1], 10) : 0;
 
-            worklogs.forEach(log => {
+            const activeSprint = issue.fields.customfield_10104.find(sprint => sprint.includes("state=ACTIVE"));
+            const startDateMatch = activeSprint.match(/startDate=([\d\-T:.]+)\.000/);
+            const sprintStartDate = startDateMatch ? new Date(startDateMatch[1]) : null;
+
+            // Filter worklogs by active sprint start date
+            const filteredWorklogs = worklogs.filter(log => {
+               const logDate = new Date(log.created);
+               return sprintStartDate && logDate >= sprintStartDate;
+            });
+            
+            filteredWorklogs.forEach(log => {
               const date = new Date(log.created).toISOString().split('T')[0]; // Extract date
               const timeSpentHours = log.timeSpentSeconds / 3600; // Convert seconds to hours
               if (!dailyTimeLogs[date]) {
