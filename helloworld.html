@@ -453,6 +453,7 @@ function fetchDataAndInitialize() {
           const epicAssigneeInvolved = {}; /*{"epic name": Set of Unique Assignees}*/
           const assigneePercentageAllocation = {}; /*Assignee and its percentage in each epic*/
           const dailyTimeLogs = {};
+          const statusBreakdown = {};
 
           issues.forEach(issue => {
             const assignee = issue.fields.assignee?.displayName || "Unassigned";
@@ -461,6 +462,9 @@ function fetchDataAndInitialize() {
             const sprintField = issue.fields.customfield_10104 || [];
             const storyPoint = issue.fields.customfield_10102 || 0;
             const epicKey = issue.fields.customfield_10106 || null; // We check this for "Unassigned EPIC"
+            const statusName = issue.fields.status?.name || "Unknown Status";
+            
+            statusBreakdown[statusName] = (statusBreakdown[statusName] || 0) + 1;
 
             if (!teamData[assignee]) {
               teamData[assignee] = {
@@ -572,6 +576,7 @@ function fetchDataAndInitialize() {
           const teamMembers = Object.values(teamData);
           generateTeamMemberCards(teamMembers);
           renderEpicCharts(epicStoryPointAllocation, epicAssigneeInvolved, assigneePercentageAllocation);
+          renderStatusChart(statusBreakdown);
 
           // Check if dailyTimeLogs has data before rendering
           if (Object.keys(dailyTimeLogs).length > 0) {
@@ -780,6 +785,62 @@ function fetchDataAndInitialize() {
       new Chart(ctx, config);
     }
 
+    function renderStatusChart(statusBreakdown) {
+      const labels = Object.keys(statusBreakdown); // Status names (e.g., Open, Closed)
+      const data = Object.values(statusBreakdown); // Corresponding counts for each status
+    
+      // Get the chart canvas context
+      const statusChartCtx = document.getElementById("issue-breakdown-chart").getContext("2d");
+    
+      // Render the pie chart
+      new Chart(statusChartCtx, {
+        type: "pie",
+        data: {
+          labels: labels, // Status names
+          datasets: [
+            {
+              data: data, // Counts of each status
+              backgroundColor: [
+                "#8e44ad",
+                "#2ecc71",
+                "#e74c3c",
+                "#3498db",
+                "#f39c12",
+                "#2c3e50",
+                "#117864",
+              ],
+            },
+          ],
+        },
+        options: {
+          layout: {
+            padding: 0, // Removes padding around the chart
+          },
+          maintainAspectRatio: true, // Maintains the default aspect ratio
+          aspectRatio: 1, // Ensures a square canvas for the pie chart
+          responsive: true, // Ensures the chart resizes with its container
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const value = context.raw; // Count of tickets in this status
+                  return `${context.label}: ${value} tickets`;
+                },
+              },
+            },
+            legend: {
+              position: "top",
+            },
+            title: {
+              display: true,
+              text: "Issue Status Breakdown",
+            },
+          },
+        },
+      });
+    }
+
+    
     function renderBieGraph(dailyTimeLogs) {
       // Extract all unique assignees from dailyTimeLogs
       const uniqueAssignees = new Set();
