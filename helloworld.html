@@ -417,12 +417,6 @@
         <canvas id="epic-assignee-allocation-chart"></canvas>
       </div>
 
-       <div class="chart-wrapper">
-        <h3>Issue Breakdown</h3>
-        <p id="chart-description">Check which epic consumed most assignees</p>
-        <canvas id="statusChartContainer"></canvas>
-      </div>
-
       <div class="chart-wrapper">
         <h3>Epic Assignee Allocation</h3>
         <p id="chart-description">Check epic wise % allocaton of each assignee</p>
@@ -453,7 +447,6 @@ function fetchDataAndInitialize() {
           const epicAssigneeInvolved = {}; /*{"epic name": Set of Unique Assignees}*/
           const assigneePercentageAllocation = {}; /*Assignee and its percentage in each epic*/
           const dailyTimeLogs = {};
-          const statusBreakdown = {};
 
           issues.forEach(issue => {
             const assignee = issue.fields.assignee?.displayName || "Unassigned";
@@ -462,13 +455,6 @@ function fetchDataAndInitialize() {
             const sprintField = issue.fields.customfield_10104 || [];
             const storyPoint = issue.fields.customfield_10102 || 0;
             const epicKey = issue.fields.customfield_10106 || null; // We check this for "Unassigned EPIC"
-            const statusName = issue.fields.status?.name || "Unknown Status";
-
-             // Update status breakdown
-            if (!statusBreakdown[statusName]) {
-              statusBreakdown[statusName] = 0;
-            }
-            statusBreakdown[statusName] += 1;
 
             if (!teamData[assignee]) {
               teamData[assignee] = {
@@ -579,7 +565,7 @@ function fetchDataAndInitialize() {
 
           const teamMembers = Object.values(teamData);
           generateTeamMemberCards(teamMembers);
-          renderEpicCharts(epicStoryPointAllocation, epicAssigneeInvolved, assigneePercentageAllocation, statusBreakdown);
+          renderEpicCharts(epicStoryPointAllocation, epicAssigneeInvolved, assigneePercentageAllocation);
 
           // Check if dailyTimeLogs has data before rendering
           if (Object.keys(dailyTimeLogs).length > 0) {
@@ -617,7 +603,7 @@ function fetchDataAndInitialize() {
       });
     }
 
-    function renderEpicCharts(epicStoryPointAllocation, epicAssigneeInvolved, assigneePercentageAllocation, statusBreakdown) {
+    function renderEpicCharts(epicStoryPointAllocation, epicAssigneeInvolved, assigneePercentageAllocation) {
       // Convert epicAllocation object to labels and data arrays
       const labels = Object.keys(epicStoryPointAllocation);
       const data = Object.values(epicStoryPointAllocation);
@@ -705,38 +691,6 @@ function fetchDataAndInitialize() {
           }
         }
       });
-
-  const statusChartContainer = document.getElementById("statusChartContainer");
-  if (statusChartContainer) {
-    const statusData = {
-      labels: Object.keys(statusBreakdown),
-      datasets: [
-        {
-          label: "Issue Status Breakdown",
-          data: Object.values(statusBreakdown),
-          backgroundColor: ["#4caf50", "#ff9800", "#f44336", "#2196f3", "#9c27b0"], // Add more colors if needed
-        },
-      ],
-    };
-
-    const statusConfig = {
-      type: "pie",
-      data: statusData,
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "top",
-          },
-          title: {
-            display: true,
-            text: "Issue Status Breakdown",
-          },
-        },
-      },
-    };
-
-    new Chart(statusChartContainer, statusConfig);
 
       renderEpicAllocationPercentageChart(assigneePercentageAllocation);
     }
