@@ -702,14 +702,14 @@ function fetchDataAndInitialize() {
         }
       });
 
-        const statuslabels = Object.keys(statusData);
+        const statuslabel = Object.keys(statusData);
         const statusdata = Object.values(statusData);
       
         const statusBreakdownCtx = document.getElementById('status-breakdown-chart').getContext('2d');
         new Chart(statusBreakdownCtx, {
           type: 'pie',
           data: {
-            labels: statuslabels,
+            labels: statuslabel,
             datasets: [{
               data: statusdata,
               backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50', '#117864'],
