@@ -418,6 +418,12 @@
       </div>
 
       <div class="chart-wrapper">
+        <h3>Issue Status Breakdown</h3>
+        <p id="chart-description">Check issue status among assignees</p>
+        <canvas id="status-breakdown-chart"></canvas>
+      </div>
+      
+      <div class="chart-wrapper">
         <h3>Epic Assignee Allocation</h3>
         <p id="chart-description">Check epic wise % allocaton of each assignee</p>
         <canvas id="epic-allocation-percentage-chart"></canvas>
@@ -447,6 +453,7 @@ function fetchDataAndInitialize() {
           const epicAssigneeInvolved = {}; /*{"epic name": Set of Unique Assignees}*/
           const assigneePercentageAllocation = {}; /*Assignee and its percentage in each epic*/
           const dailyTimeLogs = {};
+          const statusData = {};
 
           issues.forEach(issue => {
             const assignee = issue.fields.assignee?.displayName || "Unassigned";
@@ -455,6 +462,7 @@ function fetchDataAndInitialize() {
             const sprintField = issue.fields.customfield_10104 || [];
             const storyPoint = issue.fields.customfield_10102 || 0;
             const epicKey = issue.fields.customfield_10106 || null; // We check this for "Unassigned EPIC"
+            const statusName = issue.fields.status?.name || "Unknown";
 
             if (!teamData[assignee]) {
               teamData[assignee] = {
@@ -520,6 +528,8 @@ function fetchDataAndInitialize() {
               teamData[assignee].carryForwardTickets += 1;
             }
             teamData[assignee].prs += stateCount;
+
+            statusData[statusName] = (statusData[statusName] || 0) + 1;
 
             // Check if customfield_10106 is null, and if so, assign "Unassigned EPIC"
             let epicName = "Unassigned EPIC";
@@ -691,6 +701,40 @@ function fetchDataAndInitialize() {
           }
         }
       });
+
+        const statuslabels = Object.keys(statusData);
+        const statusdata = Object.values(statusData);
+      
+        const statusBreakdownCtx = document.getElementById('status-breakdown-chart').getContext('2d');
+        new Chart(statusBreakdownCtx, {
+          type: 'pie',
+          data: {
+            labels: statuslabels,
+            datasets: [{
+              data: statusdata,
+              backgroundColor: ['#8e44ad', '#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#2c3e50', '#117864'],
+            }]
+          },
+          options: {
+            layout: {
+              padding: 0,
+            },
+            maintainAspectRatio: true,
+            responsive: true,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const value = context.raw;
+                    const total = statusdata.reduce((sum, val) => sum + val, 0);
+                    const percentage = ((value / total) * 100).toFixed(2);
+                    return `${context.label}: ${value} (${percentage}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
 
       renderEpicAllocationPercentageChart(assigneePercentageAllocation);
     }
